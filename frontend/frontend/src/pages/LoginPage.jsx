@@ -2,51 +2,18 @@ import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { useState } from "react";
-import axiosInstance from "../axios";
+import { useContext } from "react";
+import AuthContext from "../context/AuthContext";
 
-const Login = () => {
-  const navigate = useNavigate();
-
-  const initialFormData = Object.freeze({
-    email: "",
-    password: "",
-  });
-
-  const [formData, setFormData] = useState(initialFormData);
-
-  const onChange = (event) => {
-    setFormData({
-      ...formData,
-      [event.target.name]: event.target.value.trim(),
-    });
-  };
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    console.log(formData);
-    axiosInstance
-      .post(`token/`, {
-        email: formData.email,
-        password: formData.password,
-      })
-      .then((res) => {
-        localStorage.setItem("access_token", res.data.access);
-        localStorage.setItem("refresh_token", res.data.refresh);
-        axiosInstance.defaults.headers["Authorization"] =
-          "JWT " + localStorage.getItem("access_token");
-        navigate("/");
-      });
-  };
-
+const LoginPage = () => {
+  let { loginUser } = useContext(AuthContext);
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
@@ -63,7 +30,7 @@ const Login = () => {
         <Typography component="h1" variant="h5">
           Sign in
         </Typography>
-        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+        <Box component="form" onSubmit={loginUser} noValidate sx={{ mt: 1 }}>
           <TextField
             margin="normal"
             required
@@ -73,7 +40,6 @@ const Login = () => {
             name="email"
             autoComplete="email"
             autoFocus
-            onChange={onChange}
           />
           <TextField
             margin="normal"
@@ -84,18 +50,12 @@ const Login = () => {
             type="password"
             id="password"
             autoComplete="current-password"
-            onChange={onChange}
-          />
-          <FormControlLabel
-            control={<Checkbox value="remember" color="primary" />}
-            label="Remember me"
           />
           <Button
             type="submit"
             fullWidth
             variant="contained"
-            sx={{ mt: 3, mb: 2 }}
-            onClick={handleSubmit}>
+            sx={{ mt: 3, mb: 2 }}>
             Sign In
           </Button>
           <Grid container>
@@ -118,4 +78,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default LoginPage;

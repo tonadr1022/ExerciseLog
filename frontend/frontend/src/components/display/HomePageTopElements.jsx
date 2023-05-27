@@ -1,6 +1,5 @@
 import { Box, Typography } from "@mui/material";
 const HomePageTopElements = () => {
-  console.log("top rerendered");
   return (
     <Box
       sx={{

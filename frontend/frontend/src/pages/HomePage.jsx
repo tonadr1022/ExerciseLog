@@ -1,13 +1,17 @@
-import ExerciseTable from "../components/ExerciseTable";
-import HomePageTopElements from "../components/HomePageTopElements";
-
+import ExerciseTable from "../components/display/ExerciseTable";
+import HomePageTopElements from "../components/display/HomePageTopElements";
+// import TestGet from "../components/TestGet";
+import AuthContext from "../context/AuthContext";
+import { useContext } from "react";
+import { Button } from "@mui/material";
 export const HomePage = () => {
-  console.log("home page rerender");
   return (
     <>
       <HomePageTopElements></HomePageTopElements>
+      {/* <TestGet /> */}
       <ExerciseTable />
     </>
   );
 };
+
 export default HomePage;

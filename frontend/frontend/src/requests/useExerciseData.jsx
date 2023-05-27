@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
-import useFetch from "./useFetch";
+import useGetRequest from "./useGetRequest";
 import { formatDuration, formatPace } from "../utils/FormatContent";
 
-const API_URL = "http://127.0.0.1:8000/api/exercises/";
+const API_URL = "exercises/";
 
 const useExerciseData = () => {
   const [exerciseData, setExerciseData] = useState([]);
-  const { data, loading, error } = useFetch(API_URL);
+  const { data, loading, error } = useGetRequest(API_URL);
   useEffect(() => {
     if (data) {
       const formattedExercises = data.map((ExerciseRow) => {

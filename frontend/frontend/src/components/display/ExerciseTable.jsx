@@ -2,9 +2,9 @@
 // import React from "react";
 import { useMemo } from "react";
 import MaterialReactTable from "material-react-table";
-import useExerciseData from "./useExerciseData";
+import useExerciseData from "../../requests/useExerciseData";
 import { Box } from "@mui/material";
-import Loading from "./headerfooter/Loading";
+import Loading from "../headerfooter/Loading";
 
 const ExerciseTable = () => {
   const tableColumns = useMemo(
@@ -26,9 +26,7 @@ const ExerciseTable = () => {
 
   const { exerciseData, loading, error } = useExerciseData();
   const handleSaveRow = async ({ exitEditingMode, row, values }) => {
-    console.log(values);
-    console.log(row);
-    console.log(row.index);
+    console.log(row, values);
     // exerciseData[row.index] = values;
     exitEditingMode();
   };

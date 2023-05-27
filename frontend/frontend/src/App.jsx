@@ -4,14 +4,19 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import HomePage from "./pages/HomePage";
 import ShoesPage from "./pages/ShoesPage";
-import Register from "./pages/Register";
-import Login from "./pages/Login";
-import Logout from "./pages/Logout";
+import Register from "./pages/RegisterPage";
 import Header from "./components/headerfooter/Header";
 import Footer from "./components/headerfooter/Footer";
 import { createContext } from "react";
 import { Box } from "@mui/material";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import CreateExercisePage from "./pages/CreateExercisePage";
+import PrivateRoute from "./utils/PrivateRoute";
+import { AuthProvider } from "./context/AuthContext";
+import LoginPage from "./pages/LoginPage";
 
+const queryClient = new QueryClient();
 export const ColorModeContext = createContext({ toggleColorMode: () => {} });
 const App = () => {
   const [mode, setMode] = useState("light");
@@ -39,17 +44,47 @@ const App = () => {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <Router>
-          <Header />
-          <Box sx={{ display: "flex", flexDirection: "column" }}>
-            <Routes>
-              <Route exact path="/" element={<HomePage />} />
-              <Route exact path="/shoes" element={<ShoesPage />} />
-              <Route exact path="/register" element={<Register />} />
-              <Route exact path="/login" element={<Login />} />
-              <Route exact path="/logout" element={<Logout />} />
-            </Routes>
-          </Box>
-          <Footer />
+          <AuthProvider>
+            <QueryClientProvider client={queryClient}>
+              <Header />
+              <Box sx={{ display: "flex", flexDirection: "column" }}>
+                <Routes>
+                  <Route
+                    exact
+                    path="/"
+                    element={
+                      <PrivateRoute>
+                        <HomePage />
+                      </PrivateRoute>
+                    }>
+                    <Route element={<HomePage />} />
+                  </Route>
+                  <Route
+                    exact
+                    path="/shoes"
+                    element={
+                      <PrivateRoute>
+                        <ShoesPage />
+                      </PrivateRoute>
+                    }
+                  />
+                  <Route exact path="/register" element={<Register />} />
+                  <Route exact path="/login" element={<LoginPage />} />
+                  <Route
+                    exact
+                    path="/exercise/create"
+                    element={
+                      <PrivateRoute>
+                        <CreateExercisePage />
+                      </PrivateRoute>
+                    }
+                  />
+                </Routes>
+              </Box>
+              <Footer />
+              <ReactQueryDevtools />
+            </QueryClientProvider>
+          </AuthProvider>
         </Router>
       </ThemeProvider>
     </ColorModeContext.Provider>

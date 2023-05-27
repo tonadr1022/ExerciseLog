@@ -12,8 +12,12 @@ import {
 import ThemeToggle from "./ThemeToggle";
 import { Link } from "react-router-dom";
 import DirectionsRunIcon from "@mui/icons-material/DirectionsRun";
+import { useContext } from "react";
+import AuthContext from "../../context/AuthContext";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
 
 const Header = () => {
+  const { user, logoutUser } = useContext(AuthContext);
   return (
     <>
       <Box sx={{ flexGrow: 1 }}>
@@ -37,21 +41,40 @@ const Header = () => {
               Exercise Log
             </Typography>
             <Stack direction="row" spacing={2} sx={{ flexGrow: 1 }}>
-              <Button to="/shoes" component={Link} color="inherit">
-                Shoes
-              </Button>
-
-              <Button color="inherit">Logout</Button>
+              {user ? (
+                <>
+                  <Button to="/shoes" component={Link} color="inherit">
+                    Shoes
+                  </Button>
+                  <IconButton
+                    to="/exercise/create"
+                    component={Link}
+                    size="large"
+                    edge="start"
+                    color="inherit">
+                    <AddCircleIcon />
+                  </IconButton>
+                </>
+              ) : null}
             </Stack>
-            <Button to="/login" component={Link} color="inherit">
-              Login
-            </Button>
-            <Button to="/register" component={Link} color="inherit">
-              Register
-            </Button>
-            <Button to="/logout" component={Link} color="inherit">
-              Logout
-            </Button>
+            {user && (
+              <Typography
+                variant="h5"
+                component="div"
+                noWrap
+                sx={{ marginRight: 4 }}>
+                Hello {user.first_name}
+              </Typography>
+            )}
+            {user ? (
+              <Button onClick={logoutUser} color="inherit">
+                Logout
+              </Button>
+            ) : (
+              <Button to="/login" component={Link} color="inherit">
+                Login
+              </Button>
+            )}
             <ThemeToggle />
           </Toolbar>
         </AppBar>
