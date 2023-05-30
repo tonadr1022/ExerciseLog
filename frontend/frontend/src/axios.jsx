@@ -1,6 +1,6 @@
 import axios from "axios";
-import AuthContext from "./context/AuthContext";
-import { useContext } from "react";
+// import AuthContext from "./context/AuthContext";
+// import { useContext } from "react";
 
 // const {authTokens} = useContext(AuthContext)
 const baseURL = "http://127.0.0.1:8000/api/";
@@ -12,8 +12,8 @@ const axiosInstance = axios.create({
     Authorization: JSON.parse(localStorage.getItem("authTokens"))
       ? "JWT " + JSON.parse(localStorage.getItem("authTokens")).access
       : null,
-    "Content-Type": "application/json",
-    accept: "application/json",
+    // "Content-Type": "application/json",
+    // accept: "application/json",
   },
 });
 // axiosInstance.interceptors.response.use(

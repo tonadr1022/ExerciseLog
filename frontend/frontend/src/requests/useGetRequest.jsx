@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
 import axiosInstance from "../axios";
-// import { useContext } from "react";
 
 const useGetRequest = (url) => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
-
   useEffect(() => {
     const getData = async () => {
       try {

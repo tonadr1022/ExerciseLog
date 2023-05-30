@@ -2,11 +2,18 @@
 // import React from "react";
 import { useMemo } from "react";
 import MaterialReactTable from "material-react-table";
-import useExerciseData from "../../requests/useExerciseData";
 import { Box } from "@mui/material";
 import Loading from "../headerfooter/Loading";
+// name: exerciseRow.name,
+// act_type: exerciseRow.act_type,
+// workout_type: exerciseRow.workout_type,
+// formatted_date: formattedDate,
+// formatted_time: formattedTime,
+// duration: formattedDuration,
+// distance: exerciseRow.distance,
+// pace: formattedPace,
 
-const ExerciseTable = () => {
+const ExerciseTable = ({ exerciseData, loading, error }) => {
   const tableColumns = useMemo(
     () => [
       { accessorKey: "name", header: "Name" },
@@ -24,7 +31,6 @@ const ExerciseTable = () => {
     []
   );
 
-  const { exerciseData, loading, error } = useExerciseData();
   const handleSaveRow = async ({ exitEditingMode, row, values }) => {
     console.log(row, values);
     // exerciseData[row.index] = values;
@@ -32,7 +38,7 @@ const ExerciseTable = () => {
   };
 
   return (
-    <Box sx={{}}>
+    <Box>
       {loading ? (
         <Loading contentType={"Exercises"} />
       ) : error ? (

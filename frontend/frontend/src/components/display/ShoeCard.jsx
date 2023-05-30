@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from "react";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
@@ -6,28 +7,70 @@ import CardMedia from "@mui/material/CardMedia";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { useState } from "react";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+} from "@mui/material";
+import axiosInstance from "../../axios";
 
-const ShoeCard = () => {
+const ShoeCard = ({ shoe, handleShoeDelete }) => {
+  const [open, setOpen] = useState(false);
+
+  const handleDeleteConfirm = async () => {
+    try {
+      handleShoeDelete(shoe.id);
+      setOpen(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleClickDelete = () => {
+    setOpen(true);
+  };
+
   return (
-    <Card sx={{ maxWidth: 345 }}>
-      {/* <CardMedia
+    <Card sx={{}}>
+      <CardMedia
         component="img"
-        alt="green iguana"
+        alt="shoe image"
         height="150"
-        image={imageFile}
-      /> */}
+        image={shoe.image_url}
+      />
       <CardContent>
         <Typography gutterBottom variant="h5" component="div">
-          Lizard
+          {shoe.nickname}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Lizards are a widespread group of squamate reptiles, with over 6,000
-          species, ranging across all continents except Antarctica
+          {shoe.notes}
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          {shoe.distance_run}
         </Typography>
       </CardContent>
       <CardActions>
-        <Button size="small">Share</Button>
-        <Button size="small">Learn More</Button>
+        <Button size="small">Edit</Button>
+        <Button onClick={handleClickDelete} size="small">
+          Delete
+        </Button>
+        <Dialog open={open} onClose={handleClose}>
+          <DialogTitle>
+            {"Are you sure you want to delete this shoe?"}
+          </DialogTitle>
+          <DialogActions>
+            <Button onClick={handleClose}>Cancel</Button>
+            <Button onClick={handleDeleteConfirm} autoFocus>
+              Confirm
+            </Button>
+          </DialogActions>
+        </Dialog>
       </CardActions>
     </Card>
   );
