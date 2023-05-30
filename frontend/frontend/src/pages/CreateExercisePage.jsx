@@ -1,4 +1,3 @@
-import Container from "@mui/material/Container";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
@@ -11,7 +10,6 @@ import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import { useForm, Controller } from "react-hook-form";
 import InputLabel from "@mui/material/InputLabel";
-import axiosInstance from "../axios";
 import { useContext } from "react";
 import AuthContext from "../context/AuthContext";
 import utc from "dayjs/plugin/utc";
@@ -22,17 +20,50 @@ import {
 } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
-import ShoeContext from "../context/ShoeContext";
+// import ShoeContext from "../context/ShoeContext";
 // import { Link } from "react-router-dom";
 import { AddCircle } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+import { addExercise } from "../api/exercisesApi";
+import { getShoes } from "../api/shoesApi";
+import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 
 const CreateExercisePage = () => {
   dayjs.extend(utc);
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
-  const { shoeData } = useContext(ShoeContext);
+  // const { shoeData } = useContext(ShoeContext);
   const { register, handleSubmit, control } = useForm();
+  const queryClient = useQueryClient();
+
+  const {
+    isLoading,
+    isError: shoesIsError,
+    error: shoesError,
+    data: shoeData,
+  } = useQuery(["shoes"], getShoes, {
+    staleTime: 10 * 60 * 1000,
+    cacheTime: 15 * (60 * 1000),
+  });
+
+  const onSuccess = () => {
+    // invalidates cache and triggers refetch
+    queryClient.invalidateQueries("exercises");
+    navigate("/");
+  };
+
+  const onError = (error) => {
+    console.log("side effect error", error);
+  };
+
+  const {
+    mutate: postExercise,
+    isError: exerciseIsError,
+    error: exerciseError,
+  } = useMutation(addExercise, {
+    onSuccess,
+    onError,
+  });
 
   const onSubmit = async (data) => {
     const a1 = dayjs(data.date_started);
@@ -47,17 +78,10 @@ const CreateExercisePage = () => {
     data["datetime_started"] = date;
     data["user"] = user.user_id;
 
-    try {
-      const response = await axiosInstance.post("exercises/", data);
-      console.log(response);
-      if (response.status === 201) {
-        navigate("/");
-      }
-    } catch (error) {
-      console.log(error);
-    }
+    postExercise(data);
   };
-  if (!shoeData.length) {
+
+  if (!(shoeData && shoeData.length)) {
     return (
       <>
         <Typography
@@ -79,12 +103,7 @@ const CreateExercisePage = () => {
     );
   }
   return (
-    <Container component="main">
-      {/* <div>
-        {shoeData.map((shoe) => (
-          <p key={shoe.id}>{shoe.nickname}</p>
-        ))}
-      </div> */}
+    <>
       <Box
         sx={{
           marginTop: 5,
@@ -272,7 +291,7 @@ const CreateExercisePage = () => {
           </Grid>
         </Box>
       </Box>
-    </Container>
+    </>
   );
 };
 

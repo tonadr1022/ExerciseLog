@@ -70,7 +70,6 @@ export const AuthProvider = ({ children }) => {
           },
         }
       );
-      console.log(response);
       if (response.status === 200) {
         setAuthTokens(response.data);
         setUser(jwtDecode(response.data.access));
@@ -85,7 +84,6 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
       }
     } catch (error) {
-      console.log(error);
       logoutUser();
     } finally {
       isRefreshing = false;

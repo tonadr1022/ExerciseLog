@@ -31,5 +31,7 @@ const style = {
 //     </Modal>
 //   );
 // };
-const EditExerciseModal = () => <div>editExerciseModal</div>;
+const EditExerciseModal = ({ exerciseToEdit }) => (
+  <div>{exerciseToEdit.name}</div>
+);
 export default EditExerciseModal;

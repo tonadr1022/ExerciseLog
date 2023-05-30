@@ -9,19 +9,17 @@ import Header from "./components/headerfooter/Header";
 // import Footer from "./components/headerfooter/Footer";
 import { createContext } from "react";
 import { Box } from "@mui/material";
-// import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import CreateExercisePage from "./pages/CreateExercisePage";
 import PrivateRoute from "./utils/PrivateRoute";
 import { AuthProvider } from "./context/AuthContext";
-import { ShoeProvider } from "./context/ShoeContext";
 import LoginPage from "./pages/LoginPage";
 import CreateShoePage from "./pages/CreateShoePage";
 import EditExerciseModal from "./components/display/EditExerciseModal";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
-const queryClient = new QueryClient();
 export const ColorModeContext = createContext({ toggleColorMode: () => {} });
+const queryClient = new QueryClient();
 
 const App = () => {
   const [mode, setMode] = useState("light");
@@ -59,9 +57,7 @@ const App = () => {
                     path="/"
                     element={
                       <PrivateRoute>
-                        <ShoeProvider>
-                          <HomePage />
-                        </ShoeProvider>
+                        <HomePage />
                       </PrivateRoute>
                     }
                   />
@@ -71,9 +67,7 @@ const App = () => {
                     path="/shoes"
                     element={
                       <PrivateRoute>
-                        <ShoeProvider>
-                          <ShoesPage />
-                        </ShoeProvider>
+                        <ShoesPage />
                       </PrivateRoute>
                     }
                   />
@@ -94,20 +88,7 @@ const App = () => {
                     path="/exercise/create"
                     element={
                       <PrivateRoute>
-                        <ShoeProvider>
-                          <CreateExercisePage />
-                        </ShoeProvider>
-                      </PrivateRoute>
-                    }
-                  />
-                  <Route
-                    exact
-                    path="/exercise/edit/:id"
-                    element={
-                      <PrivateRoute>
-                        <ShoeProvider>
-                          <EditExerciseModal />
-                        </ShoeProvider>
+                        <CreateExercisePage />
                       </PrivateRoute>
                     }
                   />

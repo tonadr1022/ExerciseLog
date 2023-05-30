@@ -14,6 +14,7 @@ import { DirectionsRun, Image } from "@mui/icons-material";
 import axiosInstance from "../axios";
 import useFilePreview from "../hooks/useFilePreview";
 import { useNavigate } from "react-router-dom";
+import { addShoe } from "../api/shoesApi";
 
 const CreateShoePage = () => {
   const navigate = useNavigate();

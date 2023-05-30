@@ -1,41 +1,12 @@
 /* eslint-disable react/prop-types */
-import React from "react";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-import { useState } from "react";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-} from "@mui/material";
-import axiosInstance from "../../axios";
 
-const ShoeCard = ({ shoe, handleShoeDelete }) => {
-  const [open, setOpen] = useState(false);
-
-  const handleDeleteConfirm = async () => {
-    try {
-      handleShoeDelete(shoe.id);
-      setOpen(false);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
-  const handleClickDelete = () => {
-    setOpen(true);
-  };
-
+const ShoeCard = ({ shoe, handleDeleteToggle }) => {
   return (
     <Card sx={{}}>
       <CardMedia
@@ -57,20 +28,9 @@ const ShoeCard = ({ shoe, handleShoeDelete }) => {
       </CardContent>
       <CardActions>
         <Button size="small">Edit</Button>
-        <Button onClick={handleClickDelete} size="small">
+        <Button onClick={() => handleDeleteToggle(shoe.id)} size="small">
           Delete
         </Button>
-        <Dialog open={open} onClose={handleClose}>
-          <DialogTitle>
-            {"Are you sure you want to delete this shoe?"}
-          </DialogTitle>
-          <DialogActions>
-            <Button onClick={handleClose}>Cancel</Button>
-            <Button onClick={handleDeleteConfirm} autoFocus>
-              Confirm
-            </Button>
-          </DialogActions>
-        </Dialog>
       </CardActions>
     </Card>
   );

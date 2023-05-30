@@ -3,27 +3,17 @@ import ExerciseCard from "./ExerciseCard";
 import { Grid, Box } from "@mui/material";
 import Loading from "../headerfooter/Loading";
 
-const ExerciseCards = ({ exerciseData, loading, error }) => {
-  console.log(exerciseData);
+const ExerciseCards = ({ exercises }) => {
   return (
     <>
       <Box>
-        {loading ? (
-          <Loading contentType={"Exercises"} />
-        ) : error ? (
-          <div>
-            <Loading contentType={"Exercises"} />
-            Error: {error.message}
-          </div>
-        ) : (
-          <Grid container spacing={2}>
-            {exerciseData.map((exercise, index) => (
-              <Grid key={index} item xs={6}>
-                <ExerciseCard exercise={exercise} />
-              </Grid>
-            ))}
-          </Grid>
-        )}
+        <Grid container spacing={2}>
+          {exercises.map((exercise, index) => (
+            <Grid key={index} item xs={6}>
+              <ExerciseCard exercise={exercise} />
+            </Grid>
+          ))}
+        </Grid>
       </Box>
     </>
   );

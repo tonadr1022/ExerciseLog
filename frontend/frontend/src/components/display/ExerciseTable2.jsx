@@ -17,10 +17,10 @@ import {
   FormControlLabel,
   Grid,
 } from "@mui/material";
-import { Edit } from "@mui/icons-material";
+import { Delete, Edit } from "@mui/icons-material";
 import { useState } from "react";
 
-const ExerciseTable2 = ({ exerciseData, editExercise, loading, error }) => {
+const ExerciseTable2 = ({ exercises, editExercise, handleExerciseDelete }) => {
   const [showWeatherColumns, setShowWeatherColumns] = useState(false);
 
   const tableColumns = useMemo(
@@ -41,85 +41,82 @@ const ExerciseTable2 = ({ exerciseData, editExercise, loading, error }) => {
   );
   return (
     <Box>
-      {loading ? (
-        <Loading contentType={"Exercises"} />
-      ) : error ? (
-        <div>
-          <Loading contentType={"Exercises"} />
-          Error: {error.message}
-        </div>
-      ) : (
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            padding: 2,
-            alignItems: "center",
-            justifyContent: "center",
-          }}>
-          <FormControlLabel
-            control={
-              <Checkbox
-                onChange={(event) =>
-                  setShowWeatherColumns(event.target.checked)
-                }
-              />
-            }
-            label="Show Weather"
-          />
-          <TableContainer sx={{ mb: 40 }} component={Paper}>
-            <Table size="small">
-              <TableHead>
-                <TableRow>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          padding: 2,
+          alignItems: "center",
+          justifyContent: "center",
+        }}>
+        <FormControlLabel
+          control={
+            <Checkbox
+              onChange={(event) => setShowWeatherColumns(event.target.checked)}
+            />
+          }
+          label="Show Weather"
+        />
+        <TableContainer sx={{ mb: 40 }} component={Paper}>
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <>
+                  <TableCell align="center"></TableCell>
+                  {tableColumns.map((column) => (
+                    <TableCell key={column.accessorKey} align="center">
+                      {column.header}
+                    </TableCell>
+                  ))}
+                  {showWeatherColumns && (
+                    <>
+                      <TableCell align="center">Temp</TableCell>
+                      <TableCell align="center">Feels Like</TableCell>
+                      <TableCell align="center">Humidity</TableCell>
+                    </>
+                  )}
+                </>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {exercises.map((exercise) => (
+                <TableRow key={exercise.id}>
                   <>
-                    <TableCell align="center"></TableCell>
+                    <TableCell align="center" width={0}>
+                      <IconButton
+                        onClick={() => editExercise(exercise.id)}
+                        size="small"
+                        color="inherit">
+                        <Edit />
+                      </IconButton>
+                    </TableCell>
+                    <TableCell align="center" width={0}>
+                      <IconButton
+                        onClick={() => handleExerciseDelete(exercise.id)}
+                        size="small"
+                        color="inherit">
+                        <Delete />
+                      </IconButton>
+                    </TableCell>
                     {tableColumns.map((column) => (
-                      <TableCell key={column.accessorKey} align="center">
-                        {column.header}
+                      <TableCell align="center" key={column.accessorKey}>
+                        {exercise[column.accessorKey]}
                       </TableCell>
                     ))}
                     {showWeatherColumns && (
                       <>
-                        <TableCell align="center">Temp</TableCell>
-                        <TableCell align="center">Feels Like</TableCell>
-                        <TableCell align="center">Humidity</TableCell>
+                        <TableCell>{exercise.temperature}</TableCell>
+                        <TableCell>{exercise.feels_like}</TableCell>
+                        <TableCell>{exercise.humidity}</TableCell>
                       </>
                     )}
                   </>
                 </TableRow>
-              </TableHead>
-              <TableBody>
-                {exerciseData.map((exercise) => (
-                  <TableRow key={exercise.id}>
-                    <>
-                      <TableCell align="center" width={0}>
-                        <IconButton
-                          onClick={() => editExercise(exercise.id)}
-                          size="small"
-                          color="inherit">
-                          <Edit />
-                        </IconButton>
-                      </TableCell>
-                      {tableColumns.map((column) => (
-                        <TableCell align="center" key={column.accessorKey}>
-                          {exercise[column.accessorKey]}
-                        </TableCell>
-                      ))}
-                      {showWeatherColumns && (
-                        <>
-                          <TableCell>{exercise.temperature}</TableCell>
-                          <TableCell>{exercise.feels_like}</TableCell>
-                          <TableCell>{exercise.humidity}</TableCell>
-                        </>
-                      )}
-                    </>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Box>
-      )}
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>
     </Box>
   );
 };
