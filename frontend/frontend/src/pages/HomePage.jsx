@@ -14,6 +14,7 @@ import {
 } from "../api/exercisesApi";
 import DeleteModal from "../components/display/DeleteModal";
 import useToggle from "../hooks/useToggle";
+import { getShoes } from "../api/shoesApi";
 
 export const HomePage = () => {
   const [deleteModalOpen, deleteModalToggle] = useToggle();
@@ -33,12 +34,15 @@ export const HomePage = () => {
     cacheTime: 15 * (60 * 1000),
   });
 
-  // const updateExerciseMutation = useMutation(updateExercise, {
-  //   onSuccess: () => {
-  //     // invalidates cache and triggers refetch
-  //     queryClient.invalidateQueries("exercises");
-  //   },
-  // });
+  const {
+    shoeIsLoading,
+    shoeIsError,
+    shoeError,
+    data: shoeData,
+  } = useQuery(["shoes"], getShoes, {
+    staleTime: 10 * 60 * 1000,
+    cacheTime: 15 * (60 * 1000),
+  });
 
   const deleteExerciseMutation = useMutation(deleteExercise, {
     onSuccess: () => {
@@ -47,7 +51,7 @@ export const HomePage = () => {
     },
   });
 
-  const handleExerciseDelete = async (id) => {
+  const handleExerciseDelete = (id) => {
     setExerciseToDelete(id);
     deleteModalToggle();
   };
@@ -61,12 +65,8 @@ export const HomePage = () => {
     setExerciseView(newView);
   };
 
-  const editExercise = (id) => {
-    setExerciseToEdit(exercises.filter((exercise) => exercise.id === id)[0]);
-    editModalToggle();
-  };
-
-  const onClose = () => {
+  const editExercise = (exercise) => {
+    setExerciseToEdit(exercise);
     editModalToggle();
   };
 
@@ -95,7 +95,7 @@ export const HomePage = () => {
         </>
       ) : (
         <>
-          {!isLoading && !isError ? (
+          {!isLoading && !isError && !shoeIsLoading ? (
             <>
               <ExerciseViewToggle
                 handleExerciseViewChange={handleExerciseViewChange}
@@ -110,13 +110,17 @@ export const HomePage = () => {
               ) : (
                 <ExerciseCards
                   exercises={exercises}
+                  editExercise={editExercise}
                   handleExerciseDelete={handleExerciseDelete}
                 />
               )}
               {editModalOpen && (
                 <EditExerciseModal
-                  onClose={onClose}
+                  open={editModalOpen}
+                  toggle={editModalToggle}
+                  shoeData={shoeData}
                   exerciseToEdit={exerciseToEdit}
+                  updateExercise={updateExercise}
                 />
               )}
               <DeleteModal

@@ -63,6 +63,7 @@ const ExerciseTable2 = ({ exercises, editExercise, handleExerciseDelete }) => {
               <TableRow>
                 <>
                   <TableCell align="center"></TableCell>
+                  <TableCell align="center"></TableCell>
                   {tableColumns.map((column) => (
                     <TableCell key={column.accessorKey} align="center">
                       {column.header}
@@ -73,6 +74,9 @@ const ExerciseTable2 = ({ exercises, editExercise, handleExerciseDelete }) => {
                       <TableCell align="center">Temp</TableCell>
                       <TableCell align="center">Feels Like</TableCell>
                       <TableCell align="center">Humidity</TableCell>
+                      <TableCell align="center">Wind</TableCell>
+                      <TableCell align="center">From Current</TableCell>
+                      <TableCell align="center">Weather Type</TableCell>
                     </>
                   )}
                 </>
@@ -82,15 +86,15 @@ const ExerciseTable2 = ({ exercises, editExercise, handleExerciseDelete }) => {
               {exercises.map((exercise) => (
                 <TableRow key={exercise.id}>
                   <>
-                    <TableCell align="center" width={0}>
+                    <TableCell align="center">
                       <IconButton
-                        onClick={() => editExercise(exercise.id)}
+                        onClick={() => editExercise(exercise)}
                         size="small"
                         color="inherit">
                         <Edit />
                       </IconButton>
                     </TableCell>
-                    <TableCell align="center" width={0}>
+                    <TableCell align="center">
                       <IconButton
                         onClick={() => handleExerciseDelete(exercise.id)}
                         size="small"
@@ -108,6 +112,15 @@ const ExerciseTable2 = ({ exercises, editExercise, handleExerciseDelete }) => {
                         <TableCell>{exercise.temperature}</TableCell>
                         <TableCell>{exercise.feels_like}</TableCell>
                         <TableCell>{exercise.humidity}</TableCell>
+                        <TableCell>{exercise.wind_speed}</TableCell>
+                        <TableCell>
+                          {exercise.from_current_api === true
+                            ? "true"
+                            : "false"}
+                        </TableCell>
+                        {exercise.weather_type ? (
+                          <TableCell>{exercise.weather_type}</TableCell>
+                        ) : null}
                       </>
                     )}
                   </>

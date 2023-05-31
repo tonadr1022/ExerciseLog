@@ -14,7 +14,6 @@ import PrivateRoute from "./utils/PrivateRoute";
 import { AuthProvider } from "./context/AuthContext";
 import LoginPage from "./pages/LoginPage";
 import CreateShoePage from "./pages/CreateShoePage";
-import EditExerciseModal from "./components/display/EditExerciseModal";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
@@ -94,7 +93,6 @@ const App = () => {
                   />
                 </Routes>
               </Box>
-              {/* <Footer /> */}
               <ReactQueryDevtools />
             </QueryClientProvider>
           </AuthProvider>

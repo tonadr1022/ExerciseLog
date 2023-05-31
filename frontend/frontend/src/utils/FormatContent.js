@@ -9,3 +9,8 @@ export const formatDuration = (duration) => {
   const totalMinutes = parseInt(hours) * 60 + parseInt(minutes);
   return `${totalMinutes < 10 ? "0" : ""}${totalMinutes}:${seconds}`;
 };
+
+export const unformatPace = (pace) => {
+  const paceParts = pace.split(":").map((part) => Number(part));
+  return Math.round((paceParts[0] + paceParts[1] / 60) * 10000) / 10000;
+};

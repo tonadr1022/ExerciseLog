@@ -27,6 +27,11 @@ import { useNavigate } from "react-router-dom";
 import { addExercise } from "../api/exercisesApi";
 import { getShoes } from "../api/shoesApi";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
+import {
+  ratingOptions,
+  stateOptions,
+  countryOptions,
+} from "../utils/constants";
 
 const CreateExercisePage = () => {
   dayjs.extend(utc);
@@ -66,16 +71,17 @@ const CreateExercisePage = () => {
   });
 
   const onSubmit = async (data) => {
-    const a1 = dayjs(data.date_started);
-    const a2 = dayjs(data.time_started);
-    const date = a1.utc().format("YYYY-MM-DD[T]") + a2.utc().format("HH:mm[Z]");
-
+    const date = dayjs(data.date_started);
+    const time = dayjs(data.time_started);
+    const datetime =
+      date.utc().format("YYYY-MM-DD[T]") + time.utc().format("HH:mm[Z]");
     delete data.date_started;
     delete data.time_started;
     if (data.pace === "") delete data.pace;
     if (data.shoe === "") delete data.shoe;
 
-    data["datetime_started"] = date;
+    data["location"] = `${data.city}, ${data.state}, ${data.country}`;
+    data["datetime_started"] = datetime;
     data["user"] = user.user_id;
 
     postExercise(data);
@@ -245,25 +251,47 @@ const CreateExercisePage = () => {
                 required
                 defaultValue={8}
                 {...register("rating", { valueAsNumber: true })}>
-                <MenuItem value={10}>10</MenuItem>
-                <MenuItem value={9}>9</MenuItem>
-                <MenuItem value={8}>8</MenuItem>
-                <MenuItem value={7}>7</MenuItem>
-                <MenuItem value={6}>6</MenuItem>
-                <MenuItem value={5}>5</MenuItem>
-                <MenuItem value={4}>4</MenuItem>
-                <MenuItem value={3}>3</MenuItem>
-                <MenuItem value={2}>2</MenuItem>
-                <MenuItem value={1}>1</MenuItem>
+                {ratingOptions.map((rating) => (
+                  <MenuItem key={rating} value={rating}>
+                    {rating}
+                  </MenuItem>
+                ))}
               </Select>
             </Grid>
             <Grid item xs={12}>
               <TextField
-                margin="normal"
                 fullWidth
-                {...register("location", { maxLength: 30 })}
-                label="Location"
+                {...register("city", { maxLength: 30 })}
+                label="City"
               />
+            </Grid>
+            <Grid item xs={6}>
+              <InputLabel id="state-label">State</InputLabel>
+              <Select
+                labelId="state-label"
+                fullWidth
+                defaultValue={"WI"}
+                {...register("state", { maxLength: 30 })}>
+                {stateOptions.map((state) => (
+                  <MenuItem key={state} value={state}>
+                    {state}
+                  </MenuItem>
+                ))}
+              </Select>
+            </Grid>
+            <Grid item xs={6}>
+              <InputLabel id="country-label">Country</InputLabel>
+              <Select
+                labelId="country-label"
+                fullWidth
+                defaultValue={"United States"}
+                {...register("country", { maxLength: 30 })}>
+                {countryOptions.map((country) => (
+                  <MenuItem key={country} value={country}>
+                    {country}
+                  </MenuItem>
+                ))}
+              </Select>
             </Grid>
             <Grid item xs={12}>
               <InputLabel id="shoe-label">Shoe</InputLabel>

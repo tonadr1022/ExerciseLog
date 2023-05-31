@@ -2,9 +2,8 @@
 import React from "react";
 import { useTheme } from "@mui/material/styles";
 import { IconButton } from "@mui/material";
-import Brightness4Icon from "@mui/icons-material/Brightness4";
-import Brightness7Icon from "@mui/icons-material/Brightness7";
 import { ColorModeContext } from "../../App";
+import { Brightness4Rounded, Brightness7Rounded } from "@mui/icons-material";
 
 function ThemeToggle() {
   const theme = useTheme();
@@ -15,10 +14,10 @@ function ThemeToggle() {
   };
   return (
     <IconButton onClick={handleToggle} color="inherit">
-      {theme.palette.mode === "dark" ? (
-        <Brightness7Icon />
+      {theme.palette.mode === "light" ? (
+        <Brightness7Rounded />
       ) : (
-        <Brightness4Icon />
+        <Brightness4Rounded />
       )}
     </IconButton>
   );

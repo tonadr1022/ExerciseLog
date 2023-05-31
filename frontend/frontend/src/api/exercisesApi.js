@@ -40,6 +40,9 @@ export const getExercises = async () => {
       formattedRow.temperature = exerciseRow.weather.temperature;
       formattedRow.humidity = exerciseRow.weather.humidity;
       formattedRow.feels_like = exerciseRow.weather.feels_like;
+      formattedRow.wind_speed = exerciseRow.weather.wind_speed;
+      formattedRow.from_current_api = exerciseRow.weather.from_current_api;
+      formattedRow.weather_type = exerciseRow.weather.type;
     }
     return formattedRow;
   });
@@ -50,8 +53,8 @@ export const addExercise = async (exercise) => {
   return await axiosInstance.post("/exercises/", exercise);
 };
 
-export const updateExercise = async (exercise) => {
-  return await axiosInstance.put(`/exercises/${exercise.id}/`, exercise);
+export const updateExercise = async ({ exercise, id }) => {
+  return await axiosInstance.put(`/exercises/${id}/`, exercise);
 };
 
 export const deleteExercise = async (id) => {
