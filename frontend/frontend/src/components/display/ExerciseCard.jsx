@@ -9,12 +9,17 @@ import {
 } from "@mui/material";
 import { getRatingColor } from "../../utils/colors";
 import ExerciseTypeIcon from "./ExerciseTypeIcon";
-const ExerciseCard = ({ exercise, editExercise, handleExerciseDelete }) => {
+const ExerciseCard = ({
+  exercise,
+  editExercise,
+  handleExerciseDelete,
+  isPersonal,
+}) => {
   // color gradient function adapted from Chat GPT
   const ratingColor = getRatingColor(exercise.rating);
 
   return (
-    <Card>
+    <Card elevation={10}>
       <CardContent>
         <Grid container spacing={1}>
           <Grid item xs={2}>
@@ -24,21 +29,23 @@ const ExerciseCard = ({ exercise, editExercise, handleExerciseDelete }) => {
               color={"primary"}
             />
           </Grid>
-          <Grid item xs={8}>
-            <Typography
-              gutterBottom
-              align="center"
-              variant="h4"
-              component="div">
-              {exercise.name}
-            </Typography>
-          </Grid>
+          {!isPersonal && (
+            <Grid item xs={8}>
+              <Typography gutterBottom variant="h4" component="div">
+                {exercise.user.first_name}
+                {exercise.user.last_name}
+              </Typography>
+            </Grid>
+          )}
+          {isPersonal && (
+            <Grid item xs={8}>
+              <Typography align="center" variant="h4" component="div">
+                {exercise.name}
+              </Typography>
+            </Grid>
+          )}
           <Grid item xs={2}>
-            <Typography
-              gutterBottom
-              align="right"
-              variant="h4"
-              sx={{ color: ratingColor }}>
+            <Typography align="right" variant="h4" sx={{ color: ratingColor }}>
               {exercise.rating}
             </Typography>
           </Grid>
@@ -69,8 +76,9 @@ const ExerciseCard = ({ exercise, editExercise, handleExerciseDelete }) => {
               variant="h6"
               align="center"
               color="text.primary">
-              Temp {exercise.temperature} | Humidity {exercise.humidity} | Feels
-              Like {exercise.feels_like}
+              Temp {exercise.weather.temperature} | Humidity{" "}
+              {exercise.weather.humidity} | Feels Like{" "}
+              {exercise.weather.feels_like}
             </Typography>
           </Grid>
           <Grid item xs={12}>
@@ -82,14 +90,28 @@ const ExerciseCard = ({ exercise, editExercise, handleExerciseDelete }) => {
           </Grid>
         </Grid>
       </CardContent>
-      <CardActions>
-        <Button size="small" onClick={() => editExercise(exercise)}>
-          Edit
-        </Button>
-        <Button size="small" onClick={() => handleExerciseDelete(exercise.id)}>
-          Delete
-        </Button>
-      </CardActions>
+      {isPersonal && (
+        <>
+          <Grid container>
+            <Grid item xs={6}>
+              <Button
+                size="large"
+                fullWidth
+                onClick={() => editExercise(exercise)}>
+                Edit
+              </Button>
+            </Grid>
+            <Grid item xs={6}>
+              <Button
+                size="large"
+                fullWidth
+                onClick={() => handleExerciseDelete(exercise.id)}>
+                Delete
+              </Button>
+            </Grid>
+          </Grid>
+        </>
+      )}{" "}
     </Card>
   );
 };

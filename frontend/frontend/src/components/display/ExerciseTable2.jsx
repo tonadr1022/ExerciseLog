@@ -20,9 +20,13 @@ import {
 import { Delete, Edit } from "@mui/icons-material";
 import { useState } from "react";
 
-const ExerciseTable2 = ({ exercises, editExercise, handleExerciseDelete }) => {
+const ExerciseTable2 = ({
+  exerciseData,
+  editExercise,
+  handleExerciseDelete,
+}) => {
   const [showWeatherColumns, setShowWeatherColumns] = useState(false);
-
+  console.log(exerciseData);
   const tableColumns = useMemo(
     () => [
       { accessorKey: "name", header: "Name" },
@@ -83,7 +87,7 @@ const ExerciseTable2 = ({ exercises, editExercise, handleExerciseDelete }) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {exercises.map((exercise) => (
+              {exerciseData.map((exercise) => (
                 <TableRow key={exercise.id}>
                   <>
                     <TableCell align="center">
@@ -109,18 +113,14 @@ const ExerciseTable2 = ({ exercises, editExercise, handleExerciseDelete }) => {
                     ))}
                     {showWeatherColumns && (
                       <>
-                        <TableCell>{exercise.temperature}</TableCell>
-                        <TableCell>{exercise.feels_like}</TableCell>
-                        <TableCell>{exercise.humidity}</TableCell>
-                        <TableCell>{exercise.wind_speed}</TableCell>
+                        <TableCell>{exercise.weather.temperature}</TableCell>
+                        <TableCell>{exercise.weather.feels_like}</TableCell>
+                        <TableCell>{exercise.weather.humidity}</TableCell>
+                        <TableCell>{exercise.weather.wind_speed}</TableCell>
                         <TableCell>
-                          {exercise.from_current_api === true
-                            ? "true"
-                            : "false"}
+                          {exercise.weather.from_current_api ? "true" : "false"}
                         </TableCell>
-                        {exercise.weather_type ? (
-                          <TableCell>{exercise.weather_type}</TableCell>
-                        ) : null}
+                        <TableCell>{exercise.weather.type}</TableCell>
                       </>
                     )}
                   </>

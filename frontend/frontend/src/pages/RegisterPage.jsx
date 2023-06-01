@@ -20,6 +20,7 @@ const Register = () => {
     username: "",
     password: "",
     firstName: "",
+    lastName: "",
   });
 
   const [formData, setFormData] = useState(initialFormData);
@@ -33,7 +34,6 @@ const Register = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log(formData);
     axiosInstance
       .post("user/register/", {
         email: formData.email,
@@ -43,8 +43,10 @@ const Register = () => {
       })
       .then((res) => {
         navigate("/login");
-        console.log(res);
-        console.log(res.data);
+      })
+      .catch((error) => {
+        console.log("registration error", error);
+        alert("Please Try Again", error);
       });
   };
 
@@ -86,6 +88,17 @@ const Register = () => {
                 fullWidth
                 id="firstName"
                 label="First Name"
+                autoFocus
+                onChange={handleChange}
+              />
+            </Grid>
+            <Grid item xs={12} sm={12}>
+              <TextField
+                name="lastName"
+                required
+                fullWidth
+                id="lastName"
+                label="Last Name"
                 autoFocus
                 onChange={handleChange}
               />

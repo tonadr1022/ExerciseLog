@@ -2,8 +2,9 @@ import { useState, useMemo } from "react";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
+import UserExercisePage from "./pages/UserExercisePage";
+import UserShoesPage from "./pages/UserShoesPage";
 import HomePage from "./pages/HomePage";
-import ShoesPage from "./pages/ShoesPage";
 import Register from "./pages/RegisterPage";
 import Header from "./components/headerfooter/Header";
 // import Footer from "./components/headerfooter/Footer";
@@ -30,12 +31,21 @@ const App = () => {
     }),
     []
   );
-
   const theme = useMemo(
     () =>
       createTheme({
         palette: {
           mode,
+          background: {
+            default: mode === "light" ? "#f3f3f3" : "#121212", // Background color for light mode
+            paper: mode === "light" ? "#d6d6d6" : "#121212",
+          },
+          primary: {
+            main: "#00845a",
+          },
+          secondary: {
+            main: "#84002a",
+          },
         },
       }),
     [mode]
@@ -60,22 +70,29 @@ const App = () => {
                       </PrivateRoute>
                     }
                   />
-
                   <Route
                     exact
-                    path="/shoes"
+                    path="/my-exercises"
                     element={
                       <PrivateRoute>
-                        <ShoesPage />
+                        <UserExercisePage />
                       </PrivateRoute>
                     }
                   />
-
+                  <Route
+                    exact
+                    path="/my-shoes"
+                    element={
+                      <PrivateRoute>
+                        <UserShoesPage />
+                      </PrivateRoute>
+                    }
+                  />
                   <Route exact path="/register" element={<Register />} />
                   <Route exact path="/login" element={<LoginPage />} />
                   <Route
                     exact
-                    path="/shoes/create"
+                    path="/create-shoe"
                     element={
                       <PrivateRoute>
                         <CreateShoePage />
@@ -84,7 +101,7 @@ const App = () => {
                   />
                   <Route
                     exact
-                    path="/exercise/create"
+                    path="/create-exercise"
                     element={
                       <PrivateRoute>
                         <CreateExercisePage />

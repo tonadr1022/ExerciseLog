@@ -1,137 +1,66 @@
-import ExerciseViewToggle from "../components/display/ExerciseViewToggle";
+import { useQuery } from "@tanstack/react-query";
+import { getAllExercises } from "../api/exercisesApi";
 import { useState } from "react";
 import ExerciseCards from "../components/display/ExerciseCards";
-import { Button } from "@mui/material";
-import { RunCircle, AddCircle } from "@mui/icons-material";
-import { Link } from "react-router-dom";
-import ExerciseTable2 from "../components/display/ExerciseTable2";
-import EditExerciseModal from "../components/display/EditExerciseModal";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  getExercises,
-  updateExercise,
-  deleteExercise,
-} from "../api/exercisesApi";
-import DeleteModal from "../components/display/DeleteModal";
-import useToggle from "../hooks/useToggle";
-import { getShoes } from "../api/shoesApi";
-
-export const HomePage = () => {
-  const [deleteModalOpen, deleteModalToggle] = useToggle();
-  const [editModalOpen, editModalToggle] = useToggle();
-  const [exerciseView, setExerciseView] = useState("Table");
-  const [exerciseToEdit, setExerciseToEdit] = useState(null);
-  const [exerciseToDelete, setExerciseToDelete] = useState(null);
-
-  const queryClient = useQueryClient();
+import { Typography, Grid } from "@mui/material";
+import ViewToggle from "../components/display/ViewToggle";
+import ShoeCards from "../components/display/ShoeCards";
+import { getAllShoes } from "../api/shoesApi";
+const HomePage = () => {
+  const [view, setView] = useState("Exercises");
   const {
-    isLoading,
-    isError,
-    error,
-    data: exercises,
-  } = useQuery(["exercises"], getExercises, {
-    staleTime: 10 * 60 * 1000,
-    cacheTime: 15 * (60 * 1000),
+    data: exerciseData,
+    isLoading: exercisesIsLoading,
+    isError: exercisesIsError,
+    error: exercisesError,
+  } = useQuery(["all_exercises"], getAllExercises, {
+    staleTime: 60 * 1000,
   });
-
   const {
-    shoeIsLoading,
-    shoeIsError,
-    shoeError,
     data: shoeData,
-  } = useQuery(["shoes"], getShoes, {
-    staleTime: 10 * 60 * 1000,
-    cacheTime: 15 * (60 * 1000),
+    isLoading: shoesIsLoading,
+    isError: shoesIsError,
+    error: shoesError,
+  } = useQuery(["all_shoes"], getAllShoes, {
+    staleTime: 60 * 1000,
   });
 
-  const deleteExerciseMutation = useMutation(deleteExercise, {
-    onSuccess: () => {
-      // invalidates cache and triggers refetch
-      queryClient.invalidateQueries("exercises");
-    },
-  });
+  if (exercisesIsError) {
+    alert("error loading content", { exercisesError });
+    return <Typography variant="h6">ERROR</Typography>;
+  }
 
-  const handleExerciseDelete = (id) => {
-    setExerciseToDelete(id);
-    deleteModalToggle();
+  const handleViewChange = (event, newView) => {
+    if (newView.length) {
+      setView(newView);
+    }
   };
 
-  const handleDeleteConfirm = async () => {
-    deleteExerciseMutation.mutate(exerciseToDelete);
-    deleteModalToggle();
-  };
-
-  const handleExerciseViewChange = (event, newView) => {
-    setExerciseView(newView);
-  };
-
-  const editExercise = (exercise) => {
-    setExerciseToEdit(exercise);
-    editModalToggle();
-  };
+  if (shoesIsError || exercisesIsError) {
+    alert("error occurred", shoesError, exercisesError);
+    return <div>Error</div>;
+  }
 
   return (
     <>
-      {!isLoading && !isError && exercises.length === 0 ? (
-        <>
-          <Button
-            component={Link}
-            to="exercise/create"
-            sx={{ m: 30, width: "30%", alignSelf: "center" }}
-            variant="contained"
-            color="secondary"
-            startIcon={<RunCircle />}>
-            Create Exercise
-          </Button>
-          <Button
-            component={Link}
-            to="/shoes/create"
-            sx={{ mb: 30, width: "30%", alignSelf: "center" }}
-            variant="contained"
-            color="secondary"
-            startIcon={<AddCircle />}>
-            Create Shoe
-          </Button>
-        </>
-      ) : (
-        <>
-          {!isLoading && !isError && !shoeIsLoading ? (
-            <>
-              <ExerciseViewToggle
-                handleExerciseViewChange={handleExerciseViewChange}
-                exerciseView={exerciseView}
-              />
-              {exerciseView === "Table" ? (
-                <ExerciseTable2
-                  editExercise={editExercise}
-                  exercises={exercises}
-                  handleExerciseDelete={handleExerciseDelete}
-                />
-              ) : (
-                <ExerciseCards
-                  exercises={exercises}
-                  editExercise={editExercise}
-                  handleExerciseDelete={handleExerciseDelete}
-                />
-              )}
-              {editModalOpen && (
-                <EditExerciseModal
-                  open={editModalOpen}
-                  toggle={editModalToggle}
-                  shoeData={shoeData}
-                  exerciseToEdit={exerciseToEdit}
-                  updateExercise={updateExercise}
-                />
-              )}
-              <DeleteModal
-                open={deleteModalOpen}
-                toggle={deleteModalToggle}
-                handleConfirm={handleDeleteConfirm}
-                itemType="exercise"
-              />
-            </>
-          ) : null}
-        </>
+      {!exercisesIsLoading && !shoesIsLoading && (
+        <Grid container padding={2} spacing={2}>
+          <Grid item xs={12}>
+            <ViewToggle
+              handleChange={handleViewChange}
+              view={view}
+              firstOption={"Exercises"}
+              secondOption={"Shoes"}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            {view === "Exercises" ? (
+              <ExerciseCards isPersonal={false} exerciseData={exerciseData} />
+            ) : (
+              <ShoeCards shoeData={shoeData} isPersonal={false} />
+            )}
+          </Grid>
+        </Grid>
       )}
     </>
   );

@@ -31,12 +31,6 @@ const ExerciseTable = ({ exerciseData, loading, error }) => {
     []
   );
 
-  const handleSaveRow = async ({ exitEditingMode, row, values }) => {
-    console.log(row, values);
-    // exerciseData[row.index] = values;
-    exitEditingMode();
-  };
-
   return (
     <Box>
       {loading ? (

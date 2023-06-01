@@ -2,61 +2,56 @@ import axiosInstance from "../axios";
 import { formatPace } from "../utils/FormatContent";
 import { formatDuration } from "../utils/FormatContent";
 
-export const getExercises = async () => {
+export const getAllExercises = async () => {
   const response = await axiosInstance.get("exercises/");
   const formattedExercises = response.data.map((exerciseRow) => {
-    const formattedDate = new Date(
+    exerciseRow.formatted_date = new Date(
       exerciseRow.datetime_started
     ).toLocaleDateString();
-    const formattedTime = new Date(
+    exerciseRow.formatted_time = new Date(
       exerciseRow.datetime_started
     ).toLocaleTimeString([], {
       hour: "2-digit",
       minute: "2-digit",
     });
-    const formattedPace =
-      exerciseRow.pace === null ? null : formatPace(exerciseRow.pace);
-    const formattedDuration =
-      exerciseRow.duration === null
-        ? null
-        : formatDuration(exerciseRow.duration);
-    let formattedRow = {
-      id: exerciseRow.id,
-      name: exerciseRow.name,
-      act_type: exerciseRow.act_type,
-      workout_type: exerciseRow.workout_type,
-      formatted_date: formattedDate,
-      formatted_time: formattedTime,
-      duration: formattedDuration,
-      distance: exerciseRow.distance,
-      pace: formattedPace,
-      rating: exerciseRow.rating,
-      notes: exerciseRow.notes,
-      log_notes: exerciseRow.log_notes,
-      location: exerciseRow.location,
-      shoe: exerciseRow.shoe,
-    };
-    if (exerciseRow.weather) {
-      formattedRow.temperature = exerciseRow.weather.temperature;
-      formattedRow.humidity = exerciseRow.weather.humidity;
-      formattedRow.feels_like = exerciseRow.weather.feels_like;
-      formattedRow.wind_speed = exerciseRow.weather.wind_speed;
-      formattedRow.from_current_api = exerciseRow.weather.from_current_api;
-      formattedRow.weather_type = exerciseRow.weather.type;
-    }
-    return formattedRow;
+    exerciseRow.pace = formatPace(exerciseRow.pace);
+    exerciseRow.duration = formatDuration(exerciseRow.duration);
+    delete exerciseRow.datetime_started;
+    console.log("all ex", exerciseRow);
+    return exerciseRow;
+  });
+  return formattedExercises;
+};
+
+export const getUserExercises = async () => {
+  const response = await axiosInstance.get("user-exercises/");
+  const formattedExercises = response.data.map((exerciseRow) => {
+    exerciseRow.formatted_date = new Date(
+      exerciseRow.datetime_started
+    ).toLocaleDateString();
+    exerciseRow.formatted_time = new Date(
+      exerciseRow.datetime_started
+    ).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    exerciseRow.pace = formatPace(exerciseRow.pace);
+    exerciseRow.duration = formatDuration(exerciseRow.duration);
+    delete exerciseRow.datetime_started;
+    console.log("user ex", exerciseRow);
+    return exerciseRow;
   });
   return formattedExercises;
 };
 
 export const addExercise = async (exercise) => {
-  return await axiosInstance.post("/exercises/", exercise);
+  return await axiosInstance.post("user-exercises/", exercise);
 };
 
 export const updateExercise = async ({ exercise, id }) => {
-  return await axiosInstance.put(`/exercises/${id}/`, exercise);
+  return await axiosInstance.put(`user-exercises/${id}/`, exercise);
 };
 
 export const deleteExercise = async (id) => {
-  return await axiosInstance.delete(`exercises/${id}/`, id);
+  return await axiosInstance.delete(`user-exercises/${id}/`, id);
 };

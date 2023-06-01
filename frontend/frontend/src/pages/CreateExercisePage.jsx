@@ -8,6 +8,7 @@ import Typography from "@mui/material/Typography";
 import DirectionsRunIcon from "@mui/icons-material/DirectionsRun";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
+import { FormControlLabel } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import InputLabel from "@mui/material/InputLabel";
 import { useContext } from "react";
@@ -25,13 +26,14 @@ import dayjs from "dayjs";
 import { AddCircle } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { addExercise } from "../api/exercisesApi";
-import { getShoes } from "../api/shoesApi";
+import { getUserShoes } from "../api/shoesApi";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import {
   ratingOptions,
   stateOptions,
   countryOptions,
 } from "../utils/constants";
+import { Checkbox } from "@mui/material";
 
 const CreateExercisePage = () => {
   dayjs.extend(utc);
@@ -46,14 +48,14 @@ const CreateExercisePage = () => {
     isError: shoesIsError,
     error: shoesError,
     data: shoeData,
-  } = useQuery(["shoes"], getShoes, {
-    staleTime: 10 * 60 * 1000,
-    cacheTime: 15 * (60 * 1000),
+  } = useQuery(["shoes"], getUserShoes, {
+    staleTime: 60 * 1000,
   });
 
   const onSuccess = () => {
     // invalidates cache and triggers refetch
     queryClient.invalidateQueries("exercises");
+    queryClient.invalidateQueries("all_exercises");
     navigate("/");
   };
 
@@ -83,7 +85,6 @@ const CreateExercisePage = () => {
     data["location"] = `${data.city}, ${data.state}, ${data.country}`;
     data["datetime_started"] = datetime;
     data["user"] = user.user_id;
-
     postExercise(data);
   };
 
@@ -98,7 +99,7 @@ const CreateExercisePage = () => {
         </Typography>
         <Button
           component={Link}
-          to="/shoes/create"
+          to="/create-shoe"
           sx={{ mb: 30, width: "30%", alignSelf: "center" }}
           variant="contained"
           color="secondary"
@@ -307,6 +308,12 @@ const CreateExercisePage = () => {
                   </MenuItem>
                 ))}
               </Select>
+            </Grid>
+            <Grid item xs={12}>
+              <FormControlLabel
+                control={<Checkbox {...register("is_public")} defaultChecked />}
+                label="Public"
+              />
             </Grid>
             <Grid item xs={12}>
               <Button

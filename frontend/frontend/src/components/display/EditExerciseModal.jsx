@@ -8,6 +8,7 @@ import Typography from "@mui/material/Typography";
 import DirectionsRunIcon from "@mui/icons-material/DirectionsRun";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
+import { FormControlLabel, Checkbox } from "@mui/material";
 import { useForm, Controller } from "react-hook-form";
 import InputLabel from "@mui/material/InputLabel";
 import { useContext } from "react";
@@ -41,16 +42,9 @@ const style = {
   p: 4,
 };
 
-const EditExerciseModal = ({
-  open,
-  toggle,
-  handleConfirm,
-  exerciseToEdit,
-  shoeData,
-}) => {
+const EditExerciseModal = ({ open, toggle, exerciseToEdit, shoeData }) => {
   dayjs.extend(utc);
   dayjs.extend(customParseFormat);
-
   const { register, handleSubmit, control } = useForm();
   const { user } = useContext(AuthContext);
   const queryClient = useQueryClient();
@@ -59,6 +53,7 @@ const EditExerciseModal = ({
     onSuccess: () => {
       // invalidates cache and triggers refetch
       queryClient.invalidateQueries("exercises");
+      queryClient.invalidateQueries("all_exercises");
     },
   });
 
@@ -254,6 +249,17 @@ const EditExerciseModal = ({
                   </MenuItem>
                 ))}
               </Select>
+            </Grid>
+            <Grid item xs={12}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    {...register("is_public")}
+                    defaultChecked={exerciseToEdit.is_public}
+                  />
+                }
+                label="Public"
+              />
             </Grid>
             <Grid item xs={12}>
               <Button

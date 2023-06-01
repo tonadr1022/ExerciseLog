@@ -41,21 +41,24 @@ const Header = () => {
               Exercise Log
             </Typography>
             <Stack direction="row" spacing={2} sx={{ flexGrow: 1 }}>
-              {user ? (
+              {user && (
                 <>
-                  <Button to="/shoes" component={Link} color="inherit">
-                    Shoes
-                  </Button>
                   <IconButton
-                    to="/exercise/create"
+                    to="/create-exercise"
                     component={Link}
                     size="large"
                     edge="start"
                     color="inherit">
                     <AddCircleIcon />
                   </IconButton>
+                  <Button to="/my-exercises" component={Link} color="inherit">
+                    My Exercises
+                  </Button>{" "}
+                  <Button to="/my-shoes" component={Link} color="inherit">
+                    My Shoes
+                  </Button>
                 </>
-              ) : null}
+              )}
             </Stack>
             {user && (
               <Typography

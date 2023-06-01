@@ -9,35 +9,43 @@ import {
   Grid,
   TextField,
   Button,
+  FormControlLabel,
+  Checkbox,
 } from "@mui/material";
 import { DirectionsRun, Image } from "@mui/icons-material";
 import axiosInstance from "../axios";
 import useFilePreview from "../hooks/useFilePreview";
 import { useNavigate } from "react-router-dom";
 import { addShoe } from "../api/shoesApi";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const CreateShoePage = () => {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
   const { register, handleSubmit, watch, reset } = useForm();
-  const watchImageUrl = watch("image_url", false);
+  const watchImageUrl = watch("image", false);
   const { imgSrc, setImgSrc } = useFilePreview(watchImageUrl);
-
+  const queryClient = useQueryClient();
   const handleImageReset = () => {
-    reset({ image_url: "" });
+    reset({ image: "" });
     setImgSrc(null);
   };
-
+  const addShoeMutation = useMutation(addShoe, {
+    onSuccess: () => {
+      queryClient.invalidateQueries("shoes");
+      queryClient.invalidateQueries("all_shoes");
+      navigate("/my-shoes");
+    },
+  });
   const onSubmit = async (data) => {
     const formData = new FormData();
 
-    if (data.image_url && data.image_url[0]) {
-      formData.append("image_url", data.image_url[0]);
+    if (data.image && data.image[0]) {
+      formData.append("image", data.image[0]);
     } else {
-      delete data.image_url;
+      delete data.image;
     }
     data = { ...data, user: user.user_id };
-    console.log(JSON.stringify(data));
 
     for (const key in data) {
       if (Object.prototype.hasOwnProperty.call(data, key)) {
@@ -45,13 +53,7 @@ const CreateShoePage = () => {
       }
     }
 
-    try {
-      const response = await axiosInstance.post("shoes/", formData);
-      console.log(response);
-      navigate("/shoes");
-    } catch (error) {
-      console.log(error);
-    }
+    addShoeMutation.mutate(formData);
   };
 
   return (
@@ -159,16 +161,23 @@ const CreateShoePage = () => {
                     type="file"
                     id="image"
                     hidden
-                    {...register("image_url")}
+                    accept="image/jpg, image/jpeg, image/png, image/gif, image/bmp"
+                    {...register("image")}
                   />
                 </Button>
               )}
             </Grid>
             <Grid item xs={12}>
+              <FormControlLabel
+                control={<Checkbox {...register("is_public")} defaultChecked />}
+                label="Public"
+              />
+            </Grid>
+            <Grid item xs={12}>
               <Button
                 type="submit"
                 variant="contained"
-                sx={{ mt: 3, mb: 3, width: "20%" }}>
+                sx={{ mt: 3, mb: 3, width: 100 }}>
                 Save
               </Button>
             </Grid>
