@@ -20,9 +20,10 @@ def get_formatted_loc_from_coords(lat, lng):
         r.raise_for_status()
         resp_json = r.json()
     except HTTPError as e:
-        return 'error'
+        return None
     formatted_loc = ' '.join(resp_json['plus_code']
-                             ['compound_code'].split(' ')[-3:])
+                             ['compound_code'].split(' ')[1:])
+
     return formatted_loc
 
 
@@ -51,6 +52,9 @@ def get_location(location):
         try:
             r = requests.get(url, params=params)
             location = r.json()
+            if len(location['results']) == 0:
+                print('no location')
+                return None
         except HTTPError as e:
             return None
 
@@ -62,7 +66,6 @@ def get_location(location):
 
 
 def get_weather_from_coordinates(location, datetime_started):
-    print("time" + str(timezone.now))
     # get coordinates from input dictionary
     lat = location["lat"]
     lng = location["lng"]
@@ -76,22 +79,23 @@ def get_weather_from_coordinates(location, datetime_started):
             "lat": lat,
             "lon": lng,
             "appid": env("WEATHER_API_KEY"),
+            "units": "imperial"
         }
         url = env("CURR_WEATHER_URL")
         r = requests.get(url, params=params)
         r.raise_for_status()
 
-        currWeather = r.json()
-        temperature = round(
-            (currWeather["main"]["temp"] - 273.15) * 9 / 5 + 32, 2)
-        feelsLike = round(
-            (currWeather["main"]["feels_like"] - 273.15) * 9 / 5 + 32, 2
-        )
-        humidity = currWeather["main"]["humidity"]
+        currWeatherJSON = r.json()
 
-        weatherDict = {"temperature": temperature,
-                       "feels_like": feelsLike, "humidity": humidity}
-        return weatherDict
+        temperature = currWeatherJSON["main"]["temp"]
+        feelsLike = currWeatherJSON["main"]["feels_like"]
+        humidity = currWeatherJSON["main"]["humidity"]
+        wind_speed = currWeatherJSON['wind']['speed']
+        type = currWeatherJSON['weather'][0]['main']
+
+        return {"temperature": temperature,
+                "feels_like": feelsLike, "humidity": humidity, 'wind_speed': wind_speed, "from_current_api": True, "type": type}
+
     else:
         # need to use timestamp of datetime
         time = datetime_started.timestamp()
@@ -99,25 +103,20 @@ def get_weather_from_coordinates(location, datetime_started):
             "lat": lat,
             "lon": lng,
             "start": time,
-
-
             "cnt": 1,
             "appid": env("WEATHER_API_KEY"),
+            "units": "imperial"
         }
         weatherURL = env("HIST_WEATHER_URL")
         r = requests.get(weatherURL, params=weatherParams)
         r.raise_for_status()
-        weatherJSON = r.json()
-        print(weatherJSON)
-        temp = round(
-            (weatherJSON["list"][0]["main"]
-                ["temp"] - 273.15) * 9 / 5 + 32, 2
-        )
-        feelsLike = round(
-            (weatherJSON["list"][0]["main"]
-                ["feels_like"] - 273.15) * 9 / 5 + 32, 2
-        )
-        humidity = weatherJSON["list"][0]["main"]["humidity"]
+        oldWeatherJSON = r.json()
 
-        return {"temp": temp,
-                "feelsLike": feelsLike, "humidity": humidity}
+        temperature = oldWeatherJSON["list"][0]["main"]["temp"]
+        feels_like = oldWeatherJSON["list"][0]["main"]["feels_like"]
+        humidity = oldWeatherJSON["list"][0]["main"]["humidity"]
+        wind_speed = oldWeatherJSON['list'][0]['wind']['speed']
+        type = oldWeatherJSON['list'][0]['weather'][0]['main']
+
+        return {"temperature": temperature,
+                "feels_like": feels_like, "humidity": humidity, 'wind_speed': wind_speed, "from_current_api": False, "type": type}
