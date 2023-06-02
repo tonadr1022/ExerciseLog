@@ -18,6 +18,20 @@ import AddCircleIcon from "@mui/icons-material/AddCircle";
 
 const Header = () => {
   const { user, logoutUser } = useContext(AuthContext);
+  const handleRedirect = () => {
+    const redirectUrl = new URL("https://www.strava.com/oauth/authorize");
+    const params = new URLSearchParams({
+      client_id: import.meta.env.VITE_STRAVA_CLIENT_ID,
+      redirect_uri: import.meta.env.VITE_REDIRECT_URI,
+      response_type: "code",
+      approval_prompt: "force",
+      scope: "read_all,activity:read_all,profile:read_all",
+      state: JSON.stringify({ user_id: user.user_id }),
+    });
+    redirectUrl.search = params.toString();
+
+    window.location.href = redirectUrl;
+  };
   return (
     <>
       <Box sx={{ flexGrow: 1 }}>
@@ -56,6 +70,9 @@ const Header = () => {
                   </Button>{" "}
                   <Button to="/my-shoes" component={Link} color="inherit">
                     My Shoes
+                  </Button>
+                  <Button onClick={handleRedirect} color="inherit">
+                    Authorize Strava
                   </Button>
                 </>
               )}

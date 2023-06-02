@@ -23,7 +23,7 @@ class CustomAccountManager(BaseUserManager):
             raise ValueError('You must provide valid email')
 
         user = self.model(email=email, user_name=user_name,
-                          first_name=first_name, last_name=last_name ** other_fields)
+                          first_name=first_name, last_name=last_name, ** other_fields)
         user.set_password(password)
         user.save()
         return user
@@ -37,6 +37,16 @@ class NewUser(AbstractBaseUser, PermissionsMixin):
     start_date = models.DateTimeField(default=timezone.now)
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
+
+    # Strava integration fields
+    strava_authorized = models.BooleanField(default=False)
+    strava_athlete_id = models.CharField(max_length=255, null=True, blank=True)
+    strava_access_token = models.CharField(
+        max_length=255, null=True, blank=True)
+    strava_refresh_token = models.CharField(
+        max_length=255, null=True, blank=True)
+    strava_access_token_expiration = models.DateTimeField(
+        blank=True, null=True)
 
     objects = CustomAccountManager()
 

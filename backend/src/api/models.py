@@ -61,8 +61,8 @@ class Exercise(models.Model):
     WORKOUT_TYPE_CHOICES = [
         ("Standard", 'Standard'),
         ("Long", 'Long'),
-        ("Speed", 'Speed'),
-        ("Recovery", "Recovery")
+        ("Workout", 'Workout'),
+        ("Race", 'Race'),
     ]
     ACTIVITY_TYPE_CHOICES = [
         ('Run', "Run"),
@@ -98,6 +98,8 @@ class Exercise(models.Model):
     notes = models.TextField(max_length=1000, blank=True, null=True)
     log_notes = models.TextField(max_length=1000, blank=True, null=True)
     location = models.CharField(max_length=100, blank=True, null=True)
+    average_heartrate = models.FloatField(blank=True, null=True)
+    total_elevation_gain = models.FloatField(blank=True, null=True)
 
     class Meta:
         ordering = ["-created_at"]

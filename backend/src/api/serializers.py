@@ -4,6 +4,82 @@ from rest_framework import serializers
 from . import weather_api_req
 from users.models import NewUser
 
+# class StravaAthleteSerializer(serializers.Serializer):
+#     id = serializers.IntegerField()
+
+
+class StravaActivitySerializer(serializers.Serializer):
+    athlete_id = serializers.SerializerMethodField(required=False)
+    name = serializers.CharField(required=False)
+    distance = serializers.SerializerMethodField(required=False)
+    duration = serializers.SerializerMethodField(required=False)
+    total_elevation_gain = serializers.SerializerMethodField(required=False)
+    type = serializers.SerializerMethodField(required=False)
+    workout_type = serializers.SerializerMethodField(required=False)
+    start_date = serializers.DateTimeField(required=False)
+    location = serializers.SerializerMethodField(required=False)
+    average_heartrate = serializers.SerializerMethodField(required=False)
+
+    def get_athlete_id(self, obj):
+        return self.initial_data['athlete']['id']
+
+    def get_location(self, obj):
+        if self.initial_data.get('start_latlng'):
+            lat = self.initial_data['start_latlng'][0]
+            lng = self.initial_data['start_latlng'][1]
+            return weather_api_req.get_formatted_loc_from_coords(lat, lng)
+
+    def get_distance(self, obj):
+        if self.initial_data.get('distance') and self.initial_data['distance'] > 0:
+            return round(self.initial_data['distance'] / 1609.34, 2)
+        else:
+            return None
+
+    def get_duration(self, obj):
+        if self.initial_data.get('moving_time'):
+            moving_time = self.initial_data['moving_time']
+            return moving_time if moving_time > 0 else None
+
+    def get_total_elevation_gain(self, obj):
+        if self.initial_data.get('total_elevation_gain') and self.initial_data['total_elevation_gain'] > 0:
+            return self.initial_data['total_elevation_gain'] * 3.281
+        else:
+            return None
+
+    def get_workout_type(self, obj):
+        if self.initial_data.get('workout_type'):
+            if self.initial_data['workout_type'] == 3:
+                return 'Workout'
+            elif self.initial_data['workout_type'] == 2:
+                return 'Long'
+            elif self.initial_data['workout_type'] == 1:
+                return 'Race'
+            else:
+                return 'Standard'
+        else:
+            return 'Standard'
+
+    def get_type(self, obj):
+        if self.initial_data.get('type'):
+            if self.initial_data['type'] in ['EBikeRide', 'Ride', 'Ride (Cycling)']:
+                return 'Bike'
+            return self.initial_data['type']
+        return None
+
+    def get_average_heartrate(self, obj):
+        if self.initial_data.get('average_heartrate'):
+            print('avg', self.initial_data['average_heartrate'])
+            return self.initial_data['average_heartrate']
+        else:
+            print('no heartrate')
+            return None
+
+
+class StravaUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NewUser
+        fields = ['id', 'strava_access_token', 'strava_refresh_token']
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -46,12 +122,12 @@ class ExerciseReadOnlySerializer(serializers.ModelSerializer):
 class ExerciseSerializer(serializers.ModelSerializer):
     weather = serializers.SerializerMethodField()
     shoe = serializers.SlugRelatedField(
-        queryset=Shoe.objects.all(), slug_field='nickname')
+        queryset=Shoe.objects.all(), slug_field='nickname', required=False)
 
     class Meta:
         model = Exercise
-        fields = ['id', 'user', 'is_public', 'name', 'act_type', 'workout_type', 'datetime_started', 'duration',
-                  'distance', 'pace', 'rating', 'notes', 'log_notes', 'location', 'shoe', 'weather']
+        fields = ['id', 'user', 'workout_type', 'is_public', 'shoe', 'weather', 'name', 'act_type', 'datetime_started',
+                  'duration', 'distance', 'pace', 'rating', 'notes', 'log_notes', 'location', 'average_heartrate', 'total_elevation_gain']
         extra_kwargs = {
             'user': {'write_only': True},
         }

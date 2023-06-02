@@ -174,8 +174,7 @@ const CreateExercisePage = () => {
                 defaultValue={"Standard"}
                 {...register("workout_type", { required: true })}>
                 <MenuItem value={"Standard"}>Standard</MenuItem>
-                <MenuItem value={"Recovery"}>Recovery</MenuItem>
-                <MenuItem value={"Speed"}>Speed</MenuItem>
+                <MenuItem value={"Workout"}>Workout</MenuItem>
                 <MenuItem value={"Long"}>Long</MenuItem>
               </Select>
             </Grid>

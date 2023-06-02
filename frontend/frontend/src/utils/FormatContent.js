@@ -5,9 +5,13 @@ export const formatPace = (pace) => {
 };
 
 export const formatDuration = (duration) => {
-  const [hours, minutes, seconds] = duration.split(":");
-  const totalMinutes = parseInt(hours) * 60 + parseInt(minutes);
-  return `${totalMinutes < 10 ? "0" : ""}${totalMinutes}:${seconds}`;
+  if (duration) {
+    const [hours, minutes, seconds] = duration.split(":");
+    const totalMinutes = parseInt(hours) * 60 + parseInt(minutes);
+    return `${totalMinutes < 10 ? "0" : ""}${totalMinutes}:${seconds}`;
+  } else {
+    return "00:00";
+  }
 };
 
 export const unformatPace = (pace) => {

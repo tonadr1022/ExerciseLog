@@ -56,7 +56,7 @@ const EditExerciseModal = ({ open, toggle, exerciseToEdit, shoeData }) => {
       queryClient.invalidateQueries("all_exercises");
     },
   });
-
+  console.log(exerciseToEdit.shoe, exerciseToEdit.rating);
   const onSubmit = async (data) => {
     const date = dayjs(data.date_started);
     const time = dayjs(data.time_started);
@@ -131,8 +131,7 @@ const EditExerciseModal = ({ open, toggle, exerciseToEdit, shoeData }) => {
                 defaultValue={exerciseToEdit.workout_type}
                 {...register("workout_type", { required: true })}>
                 <MenuItem value={"Standard"}>Standard</MenuItem>
-                <MenuItem value={"Recovery"}>Recovery</MenuItem>
-                <MenuItem value={"Speed"}>Speed</MenuItem>
+                <MenuItem value={"Workout"}>Workout</MenuItem>
                 <MenuItem value={"Long"}>Long</MenuItem>
               </Select>
             </Grid>
@@ -212,7 +211,7 @@ const EditExerciseModal = ({ open, toggle, exerciseToEdit, shoeData }) => {
                 labelId="rating-label"
                 sx={{ width: "10%", minWidth: 75 }}
                 required
-                defaultValue={exerciseToEdit.rating}
+                defaultValue={exerciseToEdit.rating || 8}
                 {...register("rating", { valueAsNumber: true })}>
                 <MenuItem value={10}>10</MenuItem>
                 <MenuItem value={9}>9</MenuItem>
@@ -241,7 +240,7 @@ const EditExerciseModal = ({ open, toggle, exerciseToEdit, shoeData }) => {
                 labelId="shoe-label"
                 sx={{ width: "50%" }}
                 required
-                defaultValue={exerciseToEdit.shoe}
+                defaultValue={exerciseToEdit.shoe || ""}
                 {...register("shoe")}>
                 {shoeData.map((shoe) => (
                   <MenuItem key={shoe.id} value={shoe.nickname}>
