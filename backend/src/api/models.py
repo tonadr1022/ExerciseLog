@@ -14,6 +14,33 @@ def calculatePace(distance, duration):
     return pace
 
 
+WORKOUT_TYPE_CHOICES = [
+    ("Standard", 'Standard'),
+    ("Long", 'Long'),
+    ("Workout", 'Workout'),
+    ("Race", 'Race'),
+]
+ACTIVITY_TYPE_CHOICES = [
+    ('Run', "Run"),
+    ('Bike', "Bike"),
+    ("Swim", "Swim"),
+    ("Elliptical", "Elliptical"),
+    ("Walk", "Walk"),
+    ('Cross Country Ski', 'Cross Country Ski'),
+    ('Alpine Ski', 'Alpine Ski')
+]
+
+
+class Map(models.Model):
+    id = models.CharField(
+        primary_key=True, max_length=255)
+    polyline = models.TextField(blank=True, null=True)
+    resource_state = models.IntegerField(blank=True, null=True)
+    summary_polyline = models.TextField(blank=True, null=True)
+    exercise = models.OneToOneField(
+        "Exercise", blank=True, null=True, on_delete=models.CASCADE, related_name='maps')
+
+
 class Shoe(models.Model):
     created_at = models.DateTimeField(
         auto_now_add=True, editable=False, null=False, blank=False
@@ -58,19 +85,6 @@ class WeatherInstance(models.Model):
 
 
 class Exercise(models.Model):
-    WORKOUT_TYPE_CHOICES = [
-        ("Standard", 'Standard'),
-        ("Long", 'Long'),
-        ("Workout", 'Workout'),
-        ("Race", 'Race'),
-    ]
-    ACTIVITY_TYPE_CHOICES = [
-        ('Run', "Run"),
-        ('Bike', "Bike"),
-        ("Swim", "Swim"),
-        ("Elliptical", "Elliptical"),
-        ("Walk", "Walk"),
-    ]
     workout_type = models.CharField(max_length=8,
                                     choices=WORKOUT_TYPE_CHOICES)
     user = models.ForeignKey(
@@ -79,10 +93,13 @@ class Exercise(models.Model):
     created_at = DateTimeUTCField(
         auto_now_add=True, editable=False, null=False, blank=False
     )
+    updated_at = DateTimeUTCField(auto_now=True)
     weather = models.ForeignKey(
         WeatherInstance, on_delete=models.CASCADE, related_name='exercise', default=None, null=True, blank=True, editable=False)
     shoe = models.ForeignKey(
         Shoe, on_delete=models.SET_NULL, blank=True, null=True, related_name='exercises')
+    map = models.OneToOneField(
+        'Map', on_delete=models.CASCADE, blank=True, null=True, related_name='exercises')
     name = models.CharField(max_length=100, default="Activity")
     act_type = models.CharField(
         max_length=30, choices=ACTIVITY_TYPE_CHOICES, default='Run')
@@ -98,18 +115,32 @@ class Exercise(models.Model):
     notes = models.TextField(max_length=1000, blank=True, null=True)
     log_notes = models.TextField(max_length=1000, blank=True, null=True)
     location = models.CharField(max_length=100, blank=True, null=True)
-    average_heartrate = models.FloatField(blank=True, null=True)
-    total_elevation_gain = models.FloatField(blank=True, null=True)
+    average_heartrate = models.DecimalField(
+        blank=True, null=True, decimal_places=1, max_digits=10)
+    max_heartrate = models.DecimalField(
+        blank=True, null=True, decimal_places=1, max_digits=10)
+    total_elevation_gain = models.DecimalField(
+        blank=True, null=True, decimal_places=1, max_digits=10)
+    strava_id = models.IntegerField(blank=True, null=True)
+    calories = models.DecimalField(
+        blank=True, null=True, decimal_places=1, max_digits=10)
 
     class Meta:
-        ordering = ["-created_at"]
+        ordering = ["-datetime_started"]
 
     def save(self, *args, **kwargs):
-        if self.shoe:
+        original_distance = 0
+        if self.pk:
+            original_exercise = Exercise.objects.get(pk=self.pk)
+            original_distance = original_exercise.distance
+
+        if self.shoe and self.distance:
             shoe = Shoe.objects.get(id=self.shoe.id)
             if shoe.distance_run and self.distance:
                 shoe.distance_run += self.distance
+                shoe.distance_run -= original_distance
                 shoe.save()
+
         if self.duration == datetime.timedelta(minutes=0):
             self.duration = None
         if None not in [self.distance, self.duration]:

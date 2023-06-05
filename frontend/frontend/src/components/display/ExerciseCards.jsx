@@ -7,17 +7,19 @@ const ExerciseCards = ({
   editExercise,
   handleExerciseDelete,
   isPersonal,
+  onDetailViewClick,
 }) => {
   return (
     <>
       <Grid container padding={4} spacing={4}>
         {exerciseData.map((exercise, index) => (
-          <Grid key={index} item xs={12} sm={6} md={4}>
+          <Grid key={index} item xs={12} sm={6}>
             <ExerciseCard
               exercise={exercise}
               editExercise={editExercise}
               handleExerciseDelete={handleExerciseDelete}
               isPersonal={isPersonal}
+              onDetailViewClick={onDetailViewClick}
             />
           </Grid>
         ))}

@@ -23,7 +23,4 @@ urlpatterns = [
     path('exercises/', views.ExercisesAllUsersListView.as_view()),
     path('shoes/', views.ShoesAllUsersListView.as_view()),
     path('', include(router.urls)),
-    path('webhook/', views.StravaWebhookView.as_view()),
-    path('strava_authorization/', views.StravaAuthorizationView.as_view())
-
 ]

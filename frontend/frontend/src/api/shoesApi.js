@@ -7,6 +7,7 @@ export const getAllShoes = async () => {
 
 export const getUserShoes = async () => {
   const response = await axiosInstance.get("user-shoes/");
+
   return response.data;
 };
 

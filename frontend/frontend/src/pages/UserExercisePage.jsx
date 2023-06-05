@@ -1,12 +1,17 @@
 import ViewToggle from "../components/display/ViewToggle";
-import { useState, useRef } from "react";
+import { useState } from "react";
 import ExerciseCards from "../components/display/ExerciseCards";
 import { Button, Typography, Box, Grid } from "@mui/material";
 import { RunCircle, AddCircle } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 import ExerciseTable2 from "../components/display/ExerciseTable2";
 import EditExerciseModal from "../components/display/EditExerciseModal";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  useInfiniteQuery,
+} from "@tanstack/react-query";
 import {
   getUserExercises,
   updateExercise,
@@ -15,24 +20,41 @@ import {
 import DeleteModal from "../components/display/DeleteModal";
 import useToggle from "../hooks/useToggle";
 import { getUserShoes } from "../api/shoesApi";
+import ExerciseDetailModal from "../components/display/ExerciseDetailModal";
 
 export const UserExercisePage = () => {
   const [deleteModalOpen, deleteModalToggle] = useToggle();
   const [editModalOpen, editModalToggle] = useToggle();
+  const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [exerciseView, setExerciseView] = useState("Card");
-  const [exerciseToEdit, setExerciseToEdit] = useState(null);
-  const [exerciseToDelete, setExerciseToDelete] = useState(null);
+  const [exercise, setExercise] = useState(null);
 
   const queryClient = useQueryClient();
+  // const {
+  //   isLoading,
+  //   isError,
+  //   error,
+  //   data: exerciseData,
+  // } = useQuery(["exercises"], getUserExercises, {
+  //   staleTime: 60 * 1000,
+  // });
+
   const {
-    isLoading,
-    isError,
-    error,
     data: exerciseData,
-  } = useQuery(["exercises"], getUserExercises, {
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage,
+    status,
+  } = useInfiniteQuery(["exercises"], getUserExercises, {
+    getNextPageParam: (lastPage) => {
+      return lastPage?.next.slice(-1);
+    },
     staleTime: 60 * 1000,
   });
 
+  console.log(exerciseData);
   const {
     shoeIsLoading,
     shoeIsError,
@@ -44,21 +66,18 @@ export const UserExercisePage = () => {
 
   const deleteExerciseMutation = useMutation(deleteExercise, {
     onSuccess: () => {
-      // invalidates cache and triggers refetch
       queryClient.invalidateQueries("exercises");
       queryClient.invalidateQueries("all_exercises");
     },
   });
 
   const handleExerciseDelete = (id) => {
-    setExerciseToDelete(id);
-    // deleteModalToggle();
+    setExercise(id);
     deleteModalToggle();
   };
 
   const handleDeleteConfirm = async () => {
-    deleteExerciseMutation.mutate(exerciseToDelete);
-    // deleteModalToggle();
+    deleteExerciseMutation.mutate(exercise);
     deleteModalToggle();
   };
 
@@ -68,37 +87,54 @@ export const UserExercisePage = () => {
     }
   };
 
+  const handleDetailClick = (exercise) => {
+    setExercise(exercise);
+    setDetailModalOpen(!detailModalOpen);
+  };
+
   const editExercise = (exercise) => {
-    setExerciseToEdit(exercise);
+    setExercise(exercise);
     editModalToggle();
   };
 
-  return (
+  return status === "loading" ? (
+    <p>Loading...</p>
+  ) : status === "error" ? (
+    <p>Error: {error.message}</p>
+  ) : (
     <>
-      {!isLoading && !isError && exerciseData.length === 0 ? (
+      {!shoeIsLoading && !shoeIsError && (
         <>
-          <Button
-            component={Link}
-            to="/create-exercise"
-            sx={{ m: 30, width: "30%", alignSelf: "center" }}
-            variant="contained"
-            color="secondary"
-            startIcon={<RunCircle />}>
-            Create Exercise
-          </Button>
-          <Button
-            component={Link}
-            to="/create-shoe"
-            sx={{ mb: 30, width: "30%", alignSelf: "center" }}
-            variant="contained"
-            color="secondary"
-            startIcon={<AddCircle />}>
-            Create Shoe
-          </Button>
-        </>
-      ) : (
-        <>
-          {!isLoading && !isError && !shoeIsLoading ? (
+          {exerciseData.length === 0 ? (
+            <Grid
+              container
+              spacing={2}
+              padding={2}
+              sx={{ textAlign: "center" }}>
+              <Grid item xs={12}>
+                <Button
+                  component={Link}
+                  to="/create-exercise"
+                  sx={{ width: "80%" }}
+                  variant="contained"
+                  color="secondary"
+                  startIcon={<RunCircle />}>
+                  Create Exercise
+                </Button>
+              </Grid>
+              <Grid item xs={12}>
+                <Button
+                  component={Link}
+                  to="/create-shoe"
+                  sx={{ width: "80%" }}
+                  variant="contained"
+                  color="secondary"
+                  startIcon={<AddCircle />}>
+                  Create Shoe
+                </Button>
+              </Grid>
+            </Grid>
+          ) : (
             <>
               <Grid container>
                 <Grid
@@ -110,7 +146,7 @@ export const UserExercisePage = () => {
                   <Button
                     component={Link}
                     color="secondary"
-                    to="/create-shoe"
+                    to="/create-exercise"
                     variant="contained"
                     fullWidth
                     sx={{
@@ -142,13 +178,29 @@ export const UserExercisePage = () => {
                       handleExerciseDelete={handleExerciseDelete}
                     />
                   ) : (
-                    <ExerciseCards
-                      exerciseData={exerciseData}
-                      isPersonal={true}
-                      editExercise={editExercise}
-                      handleExerciseDelete={handleExerciseDelete}
-                    />
+                    exerciseData.pages.map((page, index) => (
+                      <ExerciseCards
+                        key={index}
+                        exerciseData={page.results}
+                        isPersonal={true}
+                        editExercise={editExercise}
+                        handleExerciseDelete={handleExerciseDelete}
+                        onDetailViewClick={handleDetailClick}
+                      />
+                    ))
                   )}
+                </Grid>
+                <Grid item xs={12}>
+                  <Button
+                    fullWidth
+                    onClick={() => fetchNextPage()}
+                    disabled={!hasNextPage || isFetchingNextPage}>
+                    {isFetchingNextPage
+                      ? "loading more..."
+                      : hasNextPage
+                      ? "Load More"
+                      : "No More Content"}
+                  </Button>
                 </Grid>
               </Grid>
               {editModalOpen && (
@@ -156,7 +208,7 @@ export const UserExercisePage = () => {
                   open={editModalOpen}
                   toggle={editModalToggle}
                   shoeData={shoeData}
-                  exerciseToEdit={exerciseToEdit}
+                  exercise={exercise}
                   updateExercise={updateExercise}
                 />
               )}
@@ -166,8 +218,15 @@ export const UserExercisePage = () => {
                 handleConfirm={handleDeleteConfirm}
                 itemType="exercise"
               />
+              {exercise && (
+                <ExerciseDetailModal
+                  open={detailModalOpen}
+                  toggle={() => setDetailModalOpen(!detailModalOpen)}
+                  exercise={exercise}
+                />
+              )}
             </>
-          ) : null}
+          )}
         </>
       )}
     </>

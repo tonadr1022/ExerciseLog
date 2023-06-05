@@ -22,8 +22,9 @@ from rest_framework_simplejwt.views import TokenRefreshView
 from users.views import MyTokenObtainPairView
 
 urlpatterns = [
+    path('strava/', include('strava.urls', namespace="strava")),
     path("admin/", admin.site.urls),
-    path("api/", include("api.urls", namespace='blog_api')),
+    path("api/", include("api.urls", namespace='log_api')),
     path('api/user/', include('users.urls', namespace='users')),
     path('api-auth/', include('rest_framework.urls', namespace="rest_framework")),
     path('api/token/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),

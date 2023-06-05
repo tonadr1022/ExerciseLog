@@ -1,21 +1,27 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import { getAllExercises } from "../api/exercisesApi";
 import { useState } from "react";
 import ExerciseCards from "../components/display/ExerciseCards";
-import { Typography, Grid } from "@mui/material";
 import ViewToggle from "../components/display/ViewToggle";
 import ShoeCards from "../components/display/ShoeCards";
 import { getAllShoes } from "../api/shoesApi";
+import { Grid, Button, Typography } from "@mui/material/";
+import ExerciseDetailModal from "../components/display/ExerciseDetailModal";
+
 const HomePage = () => {
   const [view, setView] = useState("Exercises");
-  const {
-    data: exerciseData,
-    isLoading: exercisesIsLoading,
-    isError: exercisesIsError,
-    error: exercisesError,
-  } = useQuery(["all_exercises"], getAllExercises, {
-    staleTime: 60 * 1000,
-  });
+  const [exercise, setExercise] = useState(null);
+  const [detailModalOpen, setDetailModalOpen] = useState(false);
+
+  // const {
+  //   data: exerciseData,
+  //   isLoading: exercisesIsLoading,
+  //   isError: exercisesIsError,
+  //   error: exercisesError,
+  // } = useQuery(["all_exercises"], getAllExercises, {
+  //   staleTime: 60 * 1000,
+  // });
+
   const {
     data: shoeData,
     isLoading: shoesIsLoading,
@@ -25,42 +31,89 @@ const HomePage = () => {
     staleTime: 60 * 1000,
   });
 
-  if (exercisesIsError) {
-    alert("error loading content", { exercisesError });
-    return <Typography variant="h6">ERROR</Typography>;
-  }
+  const {
+    data: exerciseData,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage,
+    status,
+  } = useInfiniteQuery(["all_exercises"], getAllExercises, {
+    getNextPageParam: (lastPage) => {
+      return lastPage?.next.slice(-1);
+    },
+    staleTime: 60 * 1000,
+  });
+
+  const handleDetailClick = (exercise) => {
+    setExercise(exercise);
+    setDetailModalOpen(!detailModalOpen);
+  };
 
   const handleViewChange = (event, newView) => {
     if (newView.length) {
       setView(newView);
     }
   };
-
-  if (shoesIsError || exercisesIsError) {
-    alert("error occurred", shoesError, exercisesError);
-    return <div>Error</div>;
-  }
-
-  return (
+  return status === "loading" ? (
+    <p>Loading...</p>
+  ) : status === "error" ? (
+    <p>Error: {error.message}</p>
+  ) : (
     <>
-      {!exercisesIsLoading && !shoesIsLoading && (
-        <Grid container padding={2} spacing={2}>
-          <Grid item xs={12}>
-            <ViewToggle
-              handleChange={handleViewChange}
-              view={view}
-              firstOption={"Exercises"}
-              secondOption={"Shoes"}
-            />
+      {shoesIsLoading ? null : shoesIsError ? (
+        <div>
+          <span>{shoesError.message}</span>
+        </div>
+      ) : (
+        <>
+          <Grid container padding={2} spacing={2}>
+            <Grid item xs={12}>
+              <ViewToggle
+                handleChange={handleViewChange}
+                view={view}
+                firstOption={"Exercises"}
+                secondOption={"Shoes"}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              {view === "Exercises" ? (
+                exerciseData?.pages.map((page, index) => (
+                  <ExerciseCards
+                    key={index}
+                    isPersonal={false}
+                    exerciseData={page.results}
+                    onDetailViewClick={handleDetailClick}
+                  />
+                ))
+              ) : (
+                <ShoeCards shoeData={shoeData} isPersonal={false} />
+              )}
+            </Grid>
+            <Grid item xs={12}>
+              <Button
+                onClick={() => fetchNextPage()}
+                disabled={!hasNextPage || isFetchingNextPage}>
+                {isFetchingNextPage
+                  ? "loading more..."
+                  : hasNextPage
+                  ? "load more"
+                  : "nothing more"}
+              </Button>
+            </Grid>
           </Grid>
-          <Grid item xs={12}>
-            {view === "Exercises" ? (
-              <ExerciseCards isPersonal={false} exerciseData={exerciseData} />
-            ) : (
-              <ShoeCards shoeData={shoeData} isPersonal={false} />
-            )}
-          </Grid>
-        </Grid>
+          <Typography variant="h6">
+            {isFetching && !isFetchingNextPage ? "Fetching..." : null}
+          </Typography>
+        </>
+      )}
+      {exercise && (
+        <ExerciseDetailModal
+          open={detailModalOpen}
+          toggle={() => setDetailModalOpen(!detailModalOpen)}
+          exercise={exercise}
+        />
       )}
     </>
   );

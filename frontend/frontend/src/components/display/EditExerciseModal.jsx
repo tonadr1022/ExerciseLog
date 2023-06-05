@@ -42,7 +42,7 @@ const style = {
   p: 4,
 };
 
-const EditExerciseModal = ({ open, toggle, exerciseToEdit, shoeData }) => {
+const EditExerciseModal = ({ open, toggle, exercise, shoeData }) => {
   dayjs.extend(utc);
   dayjs.extend(customParseFormat);
   const { register, handleSubmit, control } = useForm();
@@ -56,7 +56,7 @@ const EditExerciseModal = ({ open, toggle, exerciseToEdit, shoeData }) => {
       queryClient.invalidateQueries("all_exercises");
     },
   });
-  console.log(exerciseToEdit.shoe, exerciseToEdit.rating);
+  console.log(exercise.shoe, exercise.rating);
   const onSubmit = async (data) => {
     const date = dayjs(data.date_started);
     const time = dayjs(data.time_started);
@@ -66,7 +66,7 @@ const EditExerciseModal = ({ open, toggle, exerciseToEdit, shoeData }) => {
     data.pace = unformatPace(data.pace);
     data["datetime_started"] = datetime;
     data["user"] = user.user_id;
-    const editExerciseVariables = { exercise: data, id: exerciseToEdit.id };
+    const editExerciseVariables = { exercise: data, id: exercise.id };
     updateExerciseMutation.mutate(editExerciseVariables);
     toggle();
   };
@@ -101,7 +101,7 @@ const EditExerciseModal = ({ open, toggle, exerciseToEdit, shoeData }) => {
                 margin="normal"
                 fullWidth
                 required
-                defaultValue={exerciseToEdit.name}
+                defaultValue={exercise.name}
                 {...register("name", { required: true, maxLength: 30 })}
                 label="Name"
                 autoFocus
@@ -113,7 +113,7 @@ const EditExerciseModal = ({ open, toggle, exerciseToEdit, shoeData }) => {
                 labelId="type-label"
                 sx={{ mb: 2, width: "100%" }}
                 required
-                defaultValue={exerciseToEdit.act_type}
+                defaultValue={exercise.act_type}
                 {...register("act_type", { required: true })}>
                 <MenuItem value={"Run"}>Run</MenuItem>
                 <MenuItem value={"Bike"}>Bike</MenuItem>
@@ -128,7 +128,7 @@ const EditExerciseModal = ({ open, toggle, exerciseToEdit, shoeData }) => {
                 labelId="workout-type-label"
                 sx={{ width: "100%" }}
                 required
-                defaultValue={exerciseToEdit.workout_type}
+                defaultValue={exercise.workout_type}
                 {...register("workout_type", { required: true })}>
                 <MenuItem value={"Standard"}>Standard</MenuItem>
                 <MenuItem value={"Workout"}>Workout</MenuItem>
@@ -140,7 +140,7 @@ const EditExerciseModal = ({ open, toggle, exerciseToEdit, shoeData }) => {
                 <Controller
                   name="date_started"
                   control={control}
-                  defaultValue={dayjs(exerciseToEdit.formatted_date)}
+                  defaultValue={dayjs(exercise.formatted_date)}
                   render={({ field }) => <DatePicker {...field} label="Date" />}
                 />
               </Grid>
@@ -148,7 +148,7 @@ const EditExerciseModal = ({ open, toggle, exerciseToEdit, shoeData }) => {
                 <Controller
                   name="time_started"
                   control={control}
-                  defaultValue={dayjs(exerciseToEdit.formatted_time, "h:mm A")}
+                  defaultValue={dayjs(exercise.formatted_time, "h:mm A")}
                   render={({ field }) => <TimePicker {...field} label="Time" />}
                 />
               </Grid>
@@ -158,7 +158,7 @@ const EditExerciseModal = ({ open, toggle, exerciseToEdit, shoeData }) => {
                 fullWidth
                 required
                 margin="normal"
-                defaultValue={exerciseToEdit.duration}
+                defaultValue={exercise.duration}
                 {...register("duration", {
                   required: true,
                 })}
@@ -170,7 +170,7 @@ const EditExerciseModal = ({ open, toggle, exerciseToEdit, shoeData }) => {
                 fullWidth
                 required
                 margin="normal"
-                defaultValue={exerciseToEdit.distance}
+                defaultValue={exercise.distance}
                 {...register("distance", {
                   valueAsNumber: true,
                   required: true,
@@ -184,7 +184,7 @@ const EditExerciseModal = ({ open, toggle, exerciseToEdit, shoeData }) => {
                 margin="normal"
                 {...register("pace")}
                 label="Pace"
-                defaultValue={exerciseToEdit.pace}
+                defaultValue={exercise.pace}
               />
             </Grid>
             <Grid item xs={12}>
@@ -193,14 +193,14 @@ const EditExerciseModal = ({ open, toggle, exerciseToEdit, shoeData }) => {
                 fullWidth
                 {...register("notes", { maxLength: 30 })}
                 label="Notes"
-                defaultValue={exerciseToEdit.notes}
+                defaultValue={exercise.notes}
               />
             </Grid>
             <Grid item xs={12}>
               <TextField
                 margin="normal"
                 fullWidth
-                defaultValue={exerciseToEdit.log_notes}
+                defaultValue={exercise.log_notes}
                 {...register("log_notes", { maxLength: 30 })}
                 label="Log Notes"
               />
@@ -211,7 +211,7 @@ const EditExerciseModal = ({ open, toggle, exerciseToEdit, shoeData }) => {
                 labelId="rating-label"
                 sx={{ width: "10%", minWidth: 75 }}
                 required
-                defaultValue={exerciseToEdit.rating || 8}
+                defaultValue={exercise.rating || 8}
                 {...register("rating", { valueAsNumber: true })}>
                 <MenuItem value={10}>10</MenuItem>
                 <MenuItem value={9}>9</MenuItem>
@@ -229,7 +229,7 @@ const EditExerciseModal = ({ open, toggle, exerciseToEdit, shoeData }) => {
               <TextField
                 margin="normal"
                 fullWidth
-                defaultValue={exerciseToEdit.location}
+                defaultValue={exercise.location}
                 {...register("location", { maxLength: 30 })}
                 label="Location"
               />
@@ -240,7 +240,7 @@ const EditExerciseModal = ({ open, toggle, exerciseToEdit, shoeData }) => {
                 labelId="shoe-label"
                 sx={{ width: "50%" }}
                 required
-                defaultValue={exerciseToEdit.shoe || ""}
+                defaultValue={exercise.shoe || ""}
                 {...register("shoe")}>
                 {shoeData.map((shoe) => (
                   <MenuItem key={shoe.id} value={shoe.nickname}>
@@ -254,7 +254,7 @@ const EditExerciseModal = ({ open, toggle, exerciseToEdit, shoeData }) => {
                 control={
                   <Checkbox
                     {...register("is_public")}
-                    defaultChecked={exerciseToEdit.is_public}
+                    defaultChecked={exercise.is_public}
                   />
                 }
                 label="Public"

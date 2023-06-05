@@ -24,7 +24,7 @@ const UserShoesPage = () => {
   } = useQuery(["shoes"], getUserShoes, {
     staleTime: 60 * 1000,
   });
-
+  console.log("shoe data", shoeData);
   const deleteShoeMutation = useMutation(deleteShoe, {
     onSuccess: () => {
       queryClient.invalidateQueries("all_shoes");

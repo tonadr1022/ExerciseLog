@@ -3,6 +3,7 @@ import { Grid } from "@mui/material";
 import ShoeCard from "./ShoeCard";
 
 const ShoeCards = ({ shoeData, editShoe, handleDeleteToggle, isPersonal }) => {
+  console.log(shoeData);
   return (
     <Grid container spacing={4} padding={4}>
       {shoeData.map((shoe) => (

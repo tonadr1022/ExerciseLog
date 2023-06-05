@@ -19,7 +19,7 @@ import AddCircleIcon from "@mui/icons-material/AddCircle";
 const Header = () => {
   const { user, logoutUser } = useContext(AuthContext);
   const handleRedirect = () => {
-    const redirectUrl = new URL("https://www.strava.com/oauth/authorize");
+    const redirectUrl = new URL("https://www.strava.com/oauth/authorize/");
     const params = new URLSearchParams({
       client_id: import.meta.env.VITE_STRAVA_CLIENT_ID,
       redirect_uri: import.meta.env.VITE_REDIRECT_URI,
