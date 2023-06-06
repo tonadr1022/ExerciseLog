@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='exercise',
             name='strava_id',
-            field=models.CharField(blank=True, null=True),
+            field=models.CharField(blank=True, null=True, max_length=100),
         ),
     ]

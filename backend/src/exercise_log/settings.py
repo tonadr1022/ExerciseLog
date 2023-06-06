@@ -99,21 +99,7 @@ WSGI_APPLICATION = 'exercise_log.wsgi.application'
 #         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
-# DEVELOPMENT_MODE = env.str("DEVELOPMENT_MODE", "False") == "True"
-# if DEVELOPMENT_MODE is True:
-#     DATABASES = {
-#         'default': {
-#             'ENGINE': 'django.db.backends.sqlite3',
-#             'NAME': BASE_DIR / 'db.sqlite3',
-#         }
-#     }
-# elif len(sys.argv) > 0 and sys.argv[1] != 'collectstatic':
-#     if env.str('DATABASE_URL', None) is None:
-#         raise Exception('DATABASE_URL environment variable not defined')
-#     DATABASES = {
-#         # type: ignore
-#         'default': dj_database_url.parse(env.str("DATABASE_URL")),
-#     }
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',

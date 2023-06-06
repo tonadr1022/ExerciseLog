@@ -80,8 +80,8 @@ class StravaWebhookView(APIView):
         refresh_token = user.strava_refresh_token
         refresh_url = "https://www.strava.com/api/v3/oauth/token"
         refresh_params = {
-            'client_id': env("STRAVA_CLIENT_ID"),
-            'client_secret': env("STRAVA_CLIENT_SECRET"),
+            'client_id': '103399',
+            'client_secret': 'bcd76a46c271b862eb75985908b5a8cf59b5b4de',
             'grant_type': 'refresh_token',
             'refresh_token': refresh_token,
         }
@@ -139,7 +139,6 @@ class StravaWebhookView(APIView):
                 print('getting and adding or replacing strava activity for this user')
                 # get the activity by ID
                 access_token = user.strava_access_token
-
                 print('object id', object_id)
                 if len(Exercise.objects.filter(strava_id=object_id)) > 0:
                     print('Object found already')

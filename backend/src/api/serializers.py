@@ -82,9 +82,9 @@ class ExerciseSerializer(serializers.ModelSerializer):
         fields = ['id', 'strava_id', 'user', 'workout_type', 'is_public', 'shoe', 'weather', 'name', 'act_type', 'datetime_started',
                   'duration', 'distance', 'pace', 'rating', 'notes', 'log_notes', 'location',
                   'average_heartrate', 'max_heartrate', 'total_elevation_gain', 'calories', 'map']
-        extra_kwargs = {
-            'user': {'write_only': True},
-        }
+        # extra_kwargs = {
+        #     'user': {'write_only': True},
+        # }
 
     def get_weather(self, exercise):
         if exercise.weather is not None:
@@ -100,31 +100,32 @@ class ExerciseSerializer(serializers.ModelSerializer):
         return None
 
     def create(self, validated_data):
-        # print('serializer validated\n\n', validated_data)
-        # print('LOCATION:  ', validated_data['location'])
-        #     if validated_data.get('location', None) and validated_data['location'].split(',')[0] == '':
-        #         location = weather_api.get_location(None)
-        #         print(location)
-        #         if location is not None:
-        #             validated_data['location'] = location['formatted_loc']
-        #     else:
-        #         location = weather_api.get_location(
-        #             validated_data['location'])
-        #     if location is not None:
-        #         validated_data['location'] = location['formatted_loc']
-        #         weather_data = weather_api.get_weather_from_coordinates(
-        #             location, validated_data['datetime_started'])
-        #         if weather_data and None not in weather_data.values():
-        #             weather = WeatherInstance.objects.create(
-        #                 user=validated_data['user'],
-        #                 temperature=weather_data['temperature'],
-        #                 humidity=weather_data['humidity'],
-        #                 feels_like=weather_data['feels_like'],
-        #                 wind_speed=weather_data['wind_speed'],
-        #                 datetime=validated_data['datetime_started'],
-        #                 from_current_api=weather_data['from_current_api'],
-        #                 type=weather_data['type'])
-        #             validated_data['weather'] = weather
+        print('serializer validated\n\n', validated_data)
+        print('LOCATION:  ', validated_data['location'])
+        if validated_data.get('location', None) and validated_data['location'].split(',')[0] == '':
+            location = weather_api.get_location(None)
+            print(location)
+            if location is not None:
+                validated_data['location'] = location['formatted_loc']
+        else:
+            location = weather_api.get_location(
+                validated_data['location'])
+
+        if location is not None:
+            validated_data['location'] = location['formatted_loc']
+            weather_data = weather_api.get_weather_from_coordinates(
+                location, validated_data['datetime_started'])
+            if weather_data and None not in weather_data.values():
+                weather = WeatherInstance.objects.create(
+                    user=validated_data['user'],
+                    temperature=weather_data['temperature'],
+                    humidity=weather_data['humidity'],
+                    feels_like=weather_data['feels_like'],
+                    wind_speed=weather_data['wind_speed'],
+                    datetime=validated_data['datetime_started'],
+                    from_current_api=weather_data['from_current_api'],
+                    type=weather_data['type'])
+                validated_data['weather'] = weather
 
        # Check if map data exists and create the Map instance
         map_data = validated_data.pop('map', None)
