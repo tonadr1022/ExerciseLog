@@ -1,2 +1,2 @@
 release: python backend/src/manage.py migrate
-web: gunicorn exercise_log.wsgi --log-file -
+web: gunicorn backend/src/exercise_log.wsgi --log-file -
