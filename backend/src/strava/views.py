@@ -50,12 +50,6 @@ class StravaWebhookSubscriptionView(APIView):
 class StravaAuthorizationView(APIView):
     def get(self, request):
         try:
-
-            hub_challenge = request.query_params.get('hub.challenge')
-            if hub_challenge:
-                response_data = {'hub.challenge': hub_challenge, }
-                return Response(response_data, status=status.HTTP_200_OK)
-
             state = request.query_params.get('state')
             code = request.query_params.get('code')
             scope = request.query_params.get('scope')
@@ -148,7 +142,9 @@ class StravaWebhookView(APIView):
 
                 print('object id', object_id)
                 if len(Exercise.objects.filter(strava_id=object_id)) > 0:
+                    print('Object found already')
                     Exercise.objects.get(strava_id=object_id).delete()
+                    print('Object deleted')
                 strava_api_url = f"https://www.strava.com/api/v3/activities/{object_id}"
                 headers = {
                     'Authorization': f'Bearer {access_token}'
@@ -156,6 +152,8 @@ class StravaWebhookView(APIView):
                 exercise_response = requests.get(
                     strava_api_url, headers=headers)
                 # If 401 status, try again ONCE after refreshing authentication
+                print('get ex response status: ',
+                      exercise_response.status_code)
                 if exercise_response.status_code == 401:
                     self.refresh_authentication(user)
                     access_token = user.strava_access_token
@@ -177,6 +175,8 @@ class StravaWebhookView(APIView):
                     datetime_object = datetime.datetime.strptime(strava_act_data[
                         'start_date'], "%Y-%m-%dT%H:%M:%S%z")
                     print('attempting to serialize')
+                    print('strava id:  ', strava_act_data.get('id', 'NO ID'))
+                    print(strava_act_data)
                     serializer = ExerciseSerializer(data={
                         'user': user.id,
                         'name': strava_act_data.get('name', None),
