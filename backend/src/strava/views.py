@@ -26,8 +26,8 @@ def get_authorization(user, code):
 
     url = 'https://www.strava.com/oauth/token'
     params = {
-        'client_id': env('STRAVA_CLIENT_ID'),
-        'client_secret': env('STRAVA_CLIENT_SECRET'),
+        'client_id': '103399',
+        'client_secret': 'bcd76a46c271b862eb75985908b5a8cf59b5b4de',
         'code': code,
         'grant_type': 'authorization_code',
     }
