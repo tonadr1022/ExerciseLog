@@ -26,13 +26,12 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env.str('SECRET_KEY', "1234321")
+SECRET_KEY = 'django-insecure-10@+*t=wby9%ysgnnb!)a(5-+iem&e!27*407l!x*s&fb=qepk'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env.str("DEBUG", "True") == "False"
+DEBUG = True
 
-ALLOWED_HOSTS = env.str("DJANGO_ALLOWED_HOSTS",
-                        "127.0.0.1,localhost").split(",")
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -103,21 +102,31 @@ WSGI_APPLICATION = 'exercise_log.wsgi.application'
 #         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
-DEVELOPMENT_MODE = env.str("DEVELOPMENT_MODE", "False") == "True"
-if DEVELOPMENT_MODE is True:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
+# DEVELOPMENT_MODE = env.str("DEVELOPMENT_MODE", "False") == "True"
+# if DEVELOPMENT_MODE is True:
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.sqlite3',
+#             'NAME': BASE_DIR / 'db.sqlite3',
+#         }
+#     }
+# elif len(sys.argv) > 0 and sys.argv[1] != 'collectstatic':
+#     if env.str('DATABASE_URL', None) is None:
+#         raise Exception('DATABASE_URL environment variable not defined')
+#     DATABASES = {
+#         # type: ignore
+#         'default': dj_database_url.parse(env.str("DATABASE_URL")),
+#     }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': '<DATABASE>',
+        'USER': '<USER>',
+        'PASSWORD': '<PASSWORD>',
+        'HOST': '<HOST>',
+        'PORT': '5432',
     }
-elif len(sys.argv) > 0 and sys.argv[1] != 'collectstatic':
-    if env.str('DATABASE_URL', None) is None:
-        raise Exception('DATABASE_URL environment variable not defined')
-    DATABASES = {
-        # type: ignore
-        'default': dj_database_url.parse(env.str("DATABASE_URL")),
-    }
+}
 
 
 # Password validation

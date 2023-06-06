@@ -13,8 +13,8 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 def get_formatted_loc_from_coords(lat, lng):
     params = {'latlng': f'{lat},{lng}',
-              'key': env("GEOLOCATE_API_KEY")}
-    url = env('GEOLOCATE_INPUT_URL')
+              'key': 'AIzaSyCfvzdIv-73cq8C8ilpG9BgFhH581_vl_Y'}
+    url = 'https://maps.googleapis.com/maps/api/geocode/json'
     try:
         r = requests.get(url, params=params)
         r.raise_for_status()
@@ -27,11 +27,10 @@ def get_formatted_loc_from_coords(lat, lng):
 
 
 def get_location(location):
-    geolocate_api_key = env('GEOLOCATE_API_KEY')
     if location is None:
         # get current location coordinates from Google geolocation API
-        params = {"key": geolocate_api_key}
-        location_url = env('GEOLOCATE_CURRENT_URL')
+        params = {"key": 'AIzaSyCfvzdIv-73cq8C8ilpG9BgFhH581_vl_Y'}
+        location_url = 'https://www.googleapis.com/geolocation/v1/geolocate'
         try:
             r = requests.post(location_url, params=params)
             r.raise_for_status()
@@ -45,9 +44,9 @@ def get_location(location):
 
     else:
         # get coordinates from location input
-        url = env("GEOLOCATE_INPUT_URL")
+        url = 'https://maps.googleapis.com/maps/api/geocode/json'
         params = {"sensor": "false",
-                  "address": location, "key": geolocate_api_key}
+                  "address": location, "key": 'AIzaSyCfvzdIv-73cq8C8ilpG9BgFhH581_vl_Y'}
         try:
             r = requests.get(url, params=params)
             location = r.json()
@@ -77,10 +76,10 @@ def get_weather_from_coordinates(location, datetime_started):
         params = {
             "lat": lat,
             "lon": lng,
-            "appid": env("WEATHER_API_KEY"),
+            "appid": '917f3f80bdd3351fe1b4ee172ccd490b',
             "units": "imperial"
         }
-        url = env("CURR_WEATHER_URL")
+        url = 'https://api.openweathermap.org/data/2.5/weather'
         r = requests.get(url, params=params)
         r.raise_for_status()
 
@@ -103,10 +102,10 @@ def get_weather_from_coordinates(location, datetime_started):
             "lon": lng,
             "start": time,
             "cnt": 1,
-            "appid": env("WEATHER_API_KEY"),
+            "appid": '917f3f80bdd3351fe1b4ee172ccd490b',
             "units": "imperial"
         }
-        weatherURL = env("HIST_WEATHER_URL")
+        weatherURL = 'https://history.openweathermap.org/data/2.5/history/city'
         r = requests.get(weatherURL, params=weatherParams)
         r.raise_for_status()
         oldWeatherJSON = r.json()
