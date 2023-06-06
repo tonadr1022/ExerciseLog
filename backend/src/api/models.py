@@ -121,7 +121,7 @@ class Exercise(models.Model):
         blank=True, null=True, decimal_places=1, max_digits=10)
     total_elevation_gain = models.DecimalField(
         blank=True, null=True, decimal_places=1, max_digits=10)
-    strava_id = models.IntegerField(blank=True, null=True)
+    strava_id = models.CharField(blank=True, null=True, max_length=100)
     calories = models.DecimalField(
         blank=True, null=True, decimal_places=1, max_digits=10)
 

@@ -23,7 +23,7 @@ class StravaActivitySerializer(serializers.Serializer):
     location = serializers.SerializerMethodField(required=False)
     average_heartrate = serializers.FloatField(required=False)
     max_heartrate = serializers.FloatField(required=False)
-    id = serializers.IntegerField(required=False)
+    id = serializers.CharField(required=False)
     calories = serializers.DecimalField(
         required=False, max_digits=10, decimal_places=1)
     map = MapSerializer(required=False)
