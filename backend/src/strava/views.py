@@ -50,6 +50,12 @@ class StravaWebhookSubscriptionView(APIView):
 class StravaAuthorizationView(APIView):
     def get(self, request):
         try:
+
+            hub_challenge = request.query_params.get('hub.challenge')
+            if hub_challenge:
+                response_data = {'hub.challenge': hub_challenge, }
+                return Response(response_data, status=status.HTTP_200_OK)
+
             state = request.query_params.get('state')
             code = request.query_params.get('code')
             scope = request.query_params.get('scope')
