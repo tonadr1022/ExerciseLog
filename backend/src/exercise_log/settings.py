@@ -120,10 +120,10 @@ WSGI_APPLICATION = 'exercise_log.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': '<DATABASE>',
-        'USER': '<USER>',
-        'PASSWORD': '<PASSWORD>',
-        'HOST': '<HOST>',
+        'NAME': 'd35i1jronq6kkn',
+        'USER': 'yuedxftbjatoiv',
+        'PASSWORD': '359387d95463cff43e43453fe9696e236f5ef444074ce34a6e7f3fda14e735dd',
+        'HOST': 'ec2-34-197-91-131.compute-1.amazonaws.com',
         'PORT': '5432',
     }
 }
