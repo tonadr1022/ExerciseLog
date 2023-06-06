@@ -198,11 +198,12 @@ class StravaWebhookView(APIView):
                     return Response({'Success': 'Activity Created'}, status=status.HTTP_200_OK)
                 else:
                     print(exercise_response.text)
-                    return Response({"Error": "Could not save activity"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                    print('not saved 1')
+                    return Response({"Error": "Could not save activity"}, status=status.HTTP_200_OK)
             except Exception:
                 print(traceback.print_exc())
-                print('not saved')
-                return Response({"Error": "Could not save activity"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                print('not saved 2')
+                return Response({"Error": "Could not save activity"}, status=status.HTTP_200_OK)
 
         # update activity: {'aspect_type': 'update', 'event_time': 1685653205, 'object_id': 9184455103,
         # 'object_type': 'activity', 'owner_id': 106301232, 'subscription_id': 242732, 'updates': {'title': 'G'}}
