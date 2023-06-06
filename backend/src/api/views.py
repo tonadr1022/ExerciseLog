@@ -24,6 +24,7 @@ class WeatherInstanceListView(APIView):
 
 class ShoesAllUsersListView(APIView):
     permission_classes = (IsAuthenticated,)
+    pagination_class = None
 
     def get(self, request, format=None):
         queryset = Shoe.objects.filter(is_public=True)
@@ -51,7 +52,7 @@ class ExerciseViewSet(viewsets.ModelViewSet):
     # pagination_class = PageNumberPagination
 
     def get_serializer_class(self):
-        if 'summary' in self.request.query_params:
+        if 'summary' in self.request.query_params:  # type: ignore
             return serializers.ExerciseSlimSerializer
 
         return super().get_serializer_class()

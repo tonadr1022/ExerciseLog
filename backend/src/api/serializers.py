@@ -13,10 +13,28 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class ExerciseSlimSerializer(serializers.ModelSerializer):
+    weather = serializers.SerializerMethodField()
+    shoe = serializers.SlugRelatedField(
+        queryset=Shoe.objects.all(), slug_field='nickname')
+
     class Meta:
         model = Exercise
         fields = ['id', 'user', 'is_public', 'name', 'act_type', 'workout_type', 'datetime_started', 'duration',
-                  'distance', 'pace', 'rating', 'notes', 'log_notes', 'location']
+                  'distance', 'pace', 'rating', 'notes', 'log_notes', 'location', 'average_heartrate',
+                  'max_heartrate', 'total_elevation_gain', 'shoe', 'weather', 'calories']
+
+    def get_weather(self, exercise):
+        if exercise.weather is not None:
+            return {
+                'id': exercise.weather.id,
+                'temperature': exercise.weather.temperature,
+                'humidity': exercise.weather.humidity,
+                'feels_like': exercise.weather.feels_like,
+                'wind_speed': exercise.weather.wind_speed,
+                'from_current_api': exercise.weather.from_current_api,
+                'type': exercise.weather.type,
+            }
+        return None
 
 
 class ExerciseReadOnlySerializer(serializers.ModelSerializer):

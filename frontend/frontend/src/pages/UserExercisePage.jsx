@@ -5,6 +5,7 @@ import { Button, Typography, Box, Grid } from "@mui/material";
 import { RunCircle, AddCircle } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 import ExerciseTable2 from "../components/display/ExerciseTable2";
+import ExerciseTable3 from "../components/display/ExerciseTable3";
 import EditExerciseModal from "../components/display/EditExerciseModal";
 import {
   useQuery,
@@ -16,6 +17,7 @@ import {
   getUserExercises,
   updateExercise,
   deleteExercise,
+  getTableExercises,
 } from "../api/exercisesApi";
 import DeleteModal from "../components/display/DeleteModal";
 import useToggle from "../hooks/useToggle";
@@ -30,14 +32,9 @@ export const UserExercisePage = () => {
   const [exercise, setExercise] = useState(null);
 
   const queryClient = useQueryClient();
-  // const {
-  //   isLoading,
-  //   isError,
-  //   error,
-  //   data: exerciseData,
-  // } = useQuery(["exercises"], getUserExercises, {
-  //   staleTime: 60 * 1000,
-  // });
+  const { data: tableData } = useQuery(["table-exercises"], getTableExercises, {
+    staleTime: 60 * 1000,
+  });
 
   const {
     data: exerciseData,
@@ -53,8 +50,6 @@ export const UserExercisePage = () => {
     },
     staleTime: 60 * 1000,
   });
-
-  console.log(exerciseData);
   const {
     shoeIsLoading,
     shoeIsError,
@@ -82,7 +77,7 @@ export const UserExercisePage = () => {
   };
 
   const handleExerciseViewChange = (event, newView) => {
-    if (newView.length) {
+    if (newView) {
       setExerciseView(newView);
     }
   };
@@ -170,38 +165,41 @@ export const UserExercisePage = () => {
                     secondOption={"Table"}
                   />
                 </Grid>
-                <Grid item xs={12}>
-                  {exerciseView === "Table" ? (
-                    <ExerciseTable2
-                      editExercise={editExercise}
-                      exerciseData={exerciseData}
-                      handleExerciseDelete={handleExerciseDelete}
-                    />
-                  ) : (
-                    exerciseData.pages.map((page, index) => (
-                      <ExerciseCards
-                        key={index}
-                        exerciseData={page.results}
-                        isPersonal={true}
-                        editExercise={editExercise}
-                        handleExerciseDelete={handleExerciseDelete}
-                        onDetailViewClick={handleDetailClick}
-                      />
-                    ))
-                  )}
+                <Grid item xs={12} sx={{ padding: 4 }}>
+                  {exerciseView === "Table"
+                    ? tableData && (
+                        // <ExerciseTable2
+                        //   editExercise={editExercise}
+                        //   tableData={tableData}
+                        //   handleExerciseDelete={handleExerciseDelete}
+                        // />
+                        <ExerciseTable3 tableData={tableData.slice(0, 10)} />
+                      )
+                    : exerciseData.pages.map((page, index) => (
+                        <ExerciseCards
+                          key={index}
+                          exerciseData={page.results}
+                          isPersonal={true}
+                          editExercise={editExercise}
+                          handleExerciseDelete={handleExerciseDelete}
+                          onDetailViewClick={handleDetailClick}
+                        />
+                      ))}
                 </Grid>
-                <Grid item xs={12}>
-                  <Button
-                    fullWidth
-                    onClick={() => fetchNextPage()}
-                    disabled={!hasNextPage || isFetchingNextPage}>
-                    {isFetchingNextPage
-                      ? "loading more..."
-                      : hasNextPage
-                      ? "Load More"
-                      : "No More Content"}
-                  </Button>
-                </Grid>
+                {exerciseView === "Card" && (
+                  <Grid item xs={12}>
+                    <Button
+                      fullWidth
+                      onClick={() => fetchNextPage()}
+                      disabled={!hasNextPage || isFetchingNextPage}>
+                      {isFetchingNextPage
+                        ? "loading more..."
+                        : hasNextPage
+                        ? "Load More"
+                        : "No More Content"}
+                    </Button>
+                  </Grid>
+                )}
               </Grid>
               {editModalOpen && (
                 <EditExerciseModal

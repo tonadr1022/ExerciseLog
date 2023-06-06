@@ -20,11 +20,7 @@ import {
 import { Delete, Edit } from "@mui/icons-material";
 import { useState } from "react";
 
-const ExerciseTable2 = ({
-  exerciseData,
-  editExercise,
-  handleExerciseDelete,
-}) => {
+const ExerciseTable2 = ({ tableData, editExercise, handleExerciseDelete }) => {
   const [showWeatherColumns, setShowWeatherColumns] = useState(false);
   const tableColumns = useMemo(
     () => [
@@ -86,53 +82,51 @@ const ExerciseTable2 = ({
               </TableRow>
             </TableHead>
             <TableBody>
-              {exerciseData.pages.map((page, index) =>
-                page.results.map((exercise) => (
-                  <TableRow
-                    key={exercise.id}
-                    hover
-                    style={{ cursor: "pointer" }}
-                    onClick={() => console.log(exercise.name)}>
-                    <>
-                      <TableCell align="center">
-                        <IconButton
-                          onClick={() => editExercise(exercise)}
-                          size="small"
-                          color="inherit">
-                          <Edit />
-                        </IconButton>
+              {tableData.map((exercise) => (
+                <TableRow
+                  key={exercise.id}
+                  hover
+                  style={{ cursor: "pointer" }}
+                  onClick={() => console.log(exercise.name)}>
+                  <>
+                    <TableCell align="center">
+                      <IconButton
+                        onClick={() => editExercise(exercise)}
+                        size="small"
+                        color="inherit">
+                        <Edit />
+                      </IconButton>
+                    </TableCell>
+                    <TableCell align="center">
+                      <IconButton
+                        onClick={() => handleExerciseDelete(exercise.id)}
+                        size="small"
+                        color="inherit">
+                        <Delete />
+                      </IconButton>
+                    </TableCell>
+                    {tableColumns.map((column) => (
+                      <TableCell align="center" key={column.accessorKey}>
+                        {exercise[column.accessorKey]}
                       </TableCell>
-                      <TableCell align="center">
-                        <IconButton
-                          onClick={() => handleExerciseDelete(exercise.id)}
-                          size="small"
-                          color="inherit">
-                          <Delete />
-                        </IconButton>
-                      </TableCell>
-                      {tableColumns.map((column) => (
-                        <TableCell align="center" key={column.accessorKey}>
-                          {exercise[column.accessorKey]}
+                    ))}
+                    {showWeatherColumns && (
+                      <>
+                        <TableCell>{exercise?.weather?.temperature}</TableCell>
+                        <TableCell>{exercise?.weather?.feels_like}</TableCell>
+                        <TableCell>{exercise?.weather?.humidity}</TableCell>
+                        <TableCell>{exercise?.weather?.wind_speed}</TableCell>
+                        <TableCell>
+                          {exercise?.weather?.from_current_api
+                            ? "true"
+                            : "false"}
                         </TableCell>
-                      ))}
-                      {showWeatherColumns && (
-                        <>
-                          <TableCell>{exercise.weather.temperature}</TableCell>
-                          <TableCell>{exercise.weather.feels_like}</TableCell>
-                          <TableCell>{exercise.weather.humidity}</TableCell>
-                          <TableCell>{exercise.weather.wind_speed}</TableCell>
-                          <TableCell>
-                            {exercise.weather.from_current_api
-                              ? "true"
-                              : "false"}
-                          </TableCell>
-                          <TableCell>{exercise.weather.type}</TableCell>
-                        </>
-                      )}
-                    </>
-                  </TableRow>
-                ))
-              )}
+                        <TableCell>{exercise?.weather?.type}</TableCell>
+                      </>
+                    )}
+                  </>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </TableContainer>

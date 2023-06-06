@@ -52,7 +52,7 @@ const HomePage = () => {
   };
 
   const handleViewChange = (event, newView) => {
-    if (newView.length) {
+    if (newView) {
       setView(newView);
     }
   };
@@ -91,17 +91,24 @@ const HomePage = () => {
                 <ShoeCards shoeData={shoeData} isPersonal={false} />
               )}
             </Grid>
-            <Grid item xs={12}>
-              <Button
-                onClick={() => fetchNextPage()}
-                disabled={!hasNextPage || isFetchingNextPage}>
-                {isFetchingNextPage
-                  ? "loading more..."
-                  : hasNextPage
-                  ? "load more"
-                  : "nothing more"}
-              </Button>
-            </Grid>
+            {view === "Exercises" ? (
+              <Grid item xs={12}>
+                <Button
+                  fullWidth
+                  variant="contained"
+                  sx={{ height: 100, marginTop: 4, marginBottom: 32 }}
+                  onClick={() => fetchNextPage()}
+                  disabled={!hasNextPage || isFetchingNextPage}>
+                  <Typography variant="h4" textTransform={"none"}>
+                    {isFetchingNextPage
+                      ? "Loading More..."
+                      : hasNextPage
+                      ? "Load More"
+                      : "nothing more"}
+                  </Typography>
+                </Button>
+              </Grid>
+            ) : null}
           </Grid>
           <Typography variant="h6">
             {isFetching && !isFetchingNextPage ? "Fetching..." : null}
