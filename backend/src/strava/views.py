@@ -63,7 +63,7 @@ class StravaAuthorizationView(APIView):
             user.strava_access_token_expiration = datetime.datetime.utcfromtimestamp(
                 strava_user_data['expires_at'])
             user.save()
-            return HttpResponseRedirect('http://localhost:5173')
+            return HttpResponseRedirect('https://exerciselog-324bd.web.app/')
 
         except json.JSONDecodeError:
             return Response({'Error': 'Invalid state parameter'}, status=status.HTTP_400_BAD_REQUEST)
