@@ -12,8 +12,9 @@ import traceback
 
 class Command(BaseCommand):
     def handle(self, *args, **kwargs):
-        with open('strava/recent_activities.json') as activity_json:
+        with open('strava/combined_detailed_activities.json') as activity_json:
             activities = json.load(activity_json)
+        failed = []
         for idx in range(len(activities)):
             try:
                 activity_data = activities[idx]
@@ -43,12 +44,16 @@ class Command(BaseCommand):
                     'average_heartrate': strava_act_data.get('average_heartrate', None),
                     'strava_id': strava_act_data.get('id', None),
                     'max_heartrate': strava_act_data.get('max_heartrate', None),
+                    'calories': strava_act_data.get('calories', None),
                     'total_elevation_gain': strava_act_data.get('total_elevation_gain', None),
                     'map': map_data,
                 })  # type: ignore
                 serializer.is_valid(raise_exception=True)
                 serializer.save()
                 self.stdout.write('\nsaved ' + str(idx + 1) + ' successfully')
+                print(failed)
             except Exception as e:
+                failed.append(idx)
+                print(failed)
                 msg = traceback.format_exc()
                 self.stdout.write(msg)
