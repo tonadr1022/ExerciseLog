@@ -11,6 +11,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         token['first_name'] = user.first_name
         token['email'] = user.email
         token['user_name'] = user.user_name
+        token['strava_authorized'] = user.strava_authorized
 
         return token
 

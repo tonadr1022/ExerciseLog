@@ -3,13 +3,15 @@ from rest_framework import serializers
 from utils import weather_api
 from users.models import NewUser
 from strava.serializers import MapSerializer
+from .datetime_utils import most_recent_monday_utc
+from datetime import timedelta
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = NewUser
         fields = ['id', 'email', 'user_name',
-                  'first_name', 'last_name', 'start_date',]
+                  'first_name', 'last_name', 'start_date', 'strava_authorized']
 
 
 class ExerciseSlimSerializer(serializers.ModelSerializer):

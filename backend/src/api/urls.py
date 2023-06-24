@@ -22,5 +22,6 @@ urlpatterns = [
     path('user-weather/', views.WeatherInstanceListView.as_view()),
     path('exercises/', views.ExercisesAllUsersListView.as_view()),
     path('shoes/', views.ShoesAllUsersListView.as_view()),
+    path('summary/', views.WeeklySummaryView.as_view()),
     path('', include(router.urls)),
 ]

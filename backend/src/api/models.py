@@ -100,8 +100,6 @@ class Exercise(models.Model):
         Shoe, on_delete=models.SET_NULL, blank=True, null=True, related_name='exercises')
     map = models.OneToOneField(
         'Map', on_delete=models.CASCADE, blank=True, null=True, related_name='exercises')
-    # map = models.ForeignKey(
-    #     Map, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=100, default="Activity")
     act_type = models.CharField(
         max_length=30, choices=ACTIVITY_TYPE_CHOICES, default='Run')

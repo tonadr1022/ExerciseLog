@@ -11,6 +11,8 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from users.models import NewUser
 from rest_framework.pagination import PageNumberPagination
+from . import datetime_utils
+from django.utils import timezone
 
 
 class WeatherInstanceListView(APIView):
@@ -98,81 +100,23 @@ class ShoeViewSet(viewsets.ModelViewSet):
         return self.queryset.filter(user=user)
 
 
-# class ExerciseListView(APIView):
-#     def get(self, request, format=None):
-#         exercises = Exercise.objects.all()
-#         serializer = ExerciseSerializer(exercises, many=True)
-#         return Response(serializer.data)
+class WeeklySummaryView(APIView):
+    # permission_classes = (IsAuthenticated,)
 
-#     def post(self, request, format=None):
-#         serializer = ExerciseSerializer(data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data, status=status.HTTP_201_CREATED)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-# class ShoeListView(APIView):
-#     def get(self, request, format=None):
-#         shoes = Shoe.objects.all()
-#         serializer = ShoeSerializer(shoes, many=True)
-#         return Response(serializer.data)
-
-#     def post(self, request, format=None):
-#         serializer = ShoeSerializer(data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data, status=status.HTTP_201_CREATED)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-# class ShoeDetailView(APIView):
-#     def get_object(self, pk):
-#         try:
-#             return Shoe.objects.get(pk=pk)
-#         except Shoe.DoesNotExist:
-#             raise http.Http404
-
-#     def get(self, request, pk, format=None):
-#         shoe = self.get_object(pk)
-#         serializer = ShoeSerializer(shoe)
-#         return Response(serializer.data)
-
-#     def put(self, request, pk, format=None):
-#         snippet = self.get_object(pk)
-#         serializer = ShoeSerializer(snippet, data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-#     def delete(self, request, pk, format=None):
-#         shoe = self.get_object(pk)
-#         shoe.delete()
-#         return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-# class ExerciseDetailView(APIView):
-#     def get_object(self, pk):
-#         try:
-#             return Exercise.objects.get(pk=pk)
-#         except Exercise.DoesNotExist:
-#             raise http.Http404
-
-#     def get(self, request, pk, format=None):
-#         exercise = self.get_object(pk)
-#         serializer = ExerciseSerializer(exercise)
-#         return Response(serializer.data)
-
-#     def put(self, request, pk, format=None):
-#         snippet = self.get_object(pk)
-#         serializer = ExerciseSerializer(snippet, data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-#     def delete(self, request, pk, format=None):
-#         exercise = self.get_object(pk)
-#         exercise.delete()
-#         return Response(status=status.HTTP_204_NO_CONTENT)
+    def get(self, request, format=None):
+        user = self.request.user
+        act_type = request.query_params.get('act_type', 'Run')
+        act_type = act_type.capitalize()
+        print(act_type)
+        datetime_start_str = request.query_params.get(
+            'datetime_start')  # , datetime_utils.most_recent_monday_utc())
+        datetime_start = datetime_start_str
+        datetime_end = request.query_params.get('datetime_end')
+        exercises = Exercise.objects.filter(
+            datetime_started__gte=datetime_start,
+            datetime_started__lte=datetime_end).filter(act_type=act_type).filter(user=user)
+        print(datetime_utils.get_recent_year_start_utc())
+        yearex = Exercise.objects.filter(
+            datetime_started__gte=datetime_utils.get_recent_year_start_utc()).filter(act_type='Run').values('distance')
+        serializer = ExerciseSerializer(exercises, many=True)
+        return Response(serializer.data)
