@@ -17,11 +17,11 @@ router.register(r'user-exercises', views.ExerciseViewSet,
                 basename='user-exercise')
 router.register(r'user-shoes', views.ShoeViewSet, basename='user-shoe')
 
-
 urlpatterns = [
     path('user-weather/', views.WeatherInstanceListView.as_view()),
     path('exercises/', views.ExercisesAllUsersListView.as_view()),
     path('shoes/', views.ShoesAllUsersListView.as_view()),
-    path('summary/', views.WeeklySummaryView.as_view()),
+    path('summary/', views.ExerciseRangeView.as_view()),
+    path('stats/', views.StatisticsView.as_view()),
     path('', include(router.urls)),
 ]

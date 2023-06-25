@@ -12,7 +12,8 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from users.models import NewUser
 from rest_framework.pagination import PageNumberPagination
 from . import datetime_utils
-from django.utils import timezone
+from datetime import timedelta, datetime
+from django.db.models import Sum, Max, Count
 
 
 class WeatherInstanceListView(APIView):
@@ -100,23 +101,76 @@ class ShoeViewSet(viewsets.ModelViewSet):
         return self.queryset.filter(user=user)
 
 
-class WeeklySummaryView(APIView):
-    # permission_classes = (IsAuthenticated,)
+class ExerciseRangeView(APIView):
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request, format=None):
         user = self.request.user
         act_type = request.query_params.get('act_type', 'Run')
         act_type = act_type.capitalize()
-        print(act_type)
         datetime_start_str = request.query_params.get(
             'datetime_start')  # , datetime_utils.most_recent_monday_utc())
         datetime_start = datetime_start_str
         datetime_end = request.query_params.get('datetime_end')
         exercises = Exercise.objects.filter(
             datetime_started__gte=datetime_start,
-            datetime_started__lte=datetime_end).filter(act_type=act_type).filter(user=user)
-        print(datetime_utils.get_recent_year_start_utc())
-        yearex = Exercise.objects.filter(
-            datetime_started__gte=datetime_utils.get_recent_year_start_utc()).filter(act_type='Run').values('distance')
+            datetime_started__lte=datetime_end).filter(user=user).filter(act_type=act_type)
         serializer = ExerciseSerializer(exercises, many=True)
         return Response(serializer.data)
+
+
+class StatisticsView(APIView):
+    permission_classes = {IsAuthenticated, }
+
+    def get(self, request, format=None):
+        user = self.request.user
+        act_type = request.query_params.get('act_type', 'Run')
+        act_type = act_type.capitalize()
+        year = int(request.query_params.get('year', 2023))
+        time_interval = request.query_params.get(
+            'time_interval', 'week').lower()
+        datetime_start = datetime_utils.get_year_start_utc(year)
+        datetime_end = datetime_start + timedelta(days=365)
+        if time_interval == 'year':
+            stats = Exercise.objects.filter(
+                datetime_started__lte=datetime_end,
+                datetime_started__gte=datetime_start).filter(
+                    user=user).filter(act_type=act_type).aggregate(total_distance=Sum('distance'),
+                                                                   max_distance=Max('distance'), total_duration=Sum('duration'),
+                                                                   total_elevation_gain=Sum(
+                                                                       'total_elevation_gain'),
+                                                                   total_calories=Sum('calories'))
+            stats.update({'year': year, 'act_type': act_type})
+            return Response(stats)
+
+        elif time_interval == 'month':
+            datetime_range = datetime_utils.get_month_datetime_ranges(year)
+        else:  # time_interval is week here
+            datetime_range = datetime_utils.get_week_datetime_ranges(year)
+
+        stats = []
+        curr_datetime = datetime.utcnow()
+        for range in datetime_range:
+            curr_datetime_start = range['start_datetime']
+            curr_datetime_end = range['end_datetime']
+
+            if curr_datetime_start > curr_datetime:
+                break
+
+            curr_month_stats = Exercise.objects.filter(datetime_started__gte=curr_datetime_start,
+                                                       datetime_started__lte=curr_datetime_end).filter(
+                user=user).filter(act_type=act_type).aggregate(
+                exercise_count=Count('id'), total_distance=Sum('distance'),
+                max_distance=Max('distance'), total_duration=Sum('duration'), total_elevation_gain=Sum('total_elevation_gain'),
+                total_calories=Sum('calories'))
+
+            if curr_month_stats['exercise_count'] == 0:
+                curr_month_stats = {}
+
+            time_frame_stats = {
+                'start_datetime': range['start_datetime'],
+                'end_datetime': range['end_datetime'], 'stats': curr_month_stats}
+            stats.append(time_frame_stats)
+
+        # year_stats.update(stats_by_month)
+        return Response(stats)
