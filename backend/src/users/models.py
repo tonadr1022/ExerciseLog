@@ -47,6 +47,7 @@ class NewUser(AbstractBaseUser, PermissionsMixin):
         max_length=255, null=True, blank=True)
     strava_access_token_expiration = models.DateTimeField(
         blank=True, null=True)
+    strava_activities_imported = models.BooleanField(default=False)
 
     objects = CustomAccountManager()
 

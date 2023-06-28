@@ -14,6 +14,7 @@ from rest_framework.pagination import PageNumberPagination
 from . import datetime_utils
 from datetime import timedelta, datetime
 from django.db.models import Sum, Max, Count
+from .tasks import import_strava_activities
 
 
 class WeatherInstanceListView(APIView):
@@ -174,3 +175,13 @@ class StatisticsView(APIView):
 
         # year_stats.update(stats_by_month)
         return Response(stats)
+
+
+class ImportStravaActivitiesView(APIView):
+    def get(self, request):
+        user = self.request.user
+        print(user)
+        import_strava_activities.delay(user.pk)
+        # insert all athlete activities into db serialized
+
+        return Response({'Success': 'Attempting to import activities'})

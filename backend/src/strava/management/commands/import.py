@@ -29,9 +29,6 @@ class Command(BaseCommand):
                 if len(Exercise.objects.filter(datetime_started=datetime_object)) > 0:
                     continue
                 map_data = strava_act_data['map']
-                # map_serializer = MapSerializer(data=strava_act_data['map'])
-                # map_serializer.is_valid(raise_exception=True)
-                # map_instance = map_serializer.save()
                 serializer = ExerciseSerializer(data={
                     'user': user.id,
                     'name': strava_act_data.get('name', None),

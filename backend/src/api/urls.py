@@ -23,5 +23,6 @@ urlpatterns = [
     path('shoes/', views.ShoesAllUsersListView.as_view()),
     path('summary/', views.ExerciseRangeView.as_view()),
     path('stats/', views.StatisticsView.as_view()),
+    path('import-strava/', views.ImportStravaActivitiesView.as_view()),
     path('', include(router.urls)),
 ]
